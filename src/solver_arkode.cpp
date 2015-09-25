@@ -6,6 +6,9 @@
 #include <arkode/arkode.h>            /* prototypes for ARKode fcts., consts. */
 #include <nvector/nvector_serial.h>   /* serial N_Vector types, fcts., macros */
 #include <sundials/sundials_types.h>  /* def. of type 'realtype' */
+#include <arkode/arkode_band.h>       /* prototype for ARKBand solver */
+
+//#include <sundials/sundials_band.h>   /* defs. of DlsMat and BAND_ELEM */
 
 #include "computelib.h"
 #include "gather.h"
@@ -24,6 +27,28 @@ static int f(realtype t, N_Vector y, N_Vector ydot, void *user_data)
 	N_VectorContent_Serial yDotContent = (N_VectorContent_Serial) ydot->content;
 
 	compute(grid, smc, ec, cpl_cef, t, yContent->data, yDotContent->data);
+	t_stamp.computeDerivatives_call_counter += 1;
+
+	return 0;  // Success.
+}
+
+static int fi(realtype t, N_Vector y, N_Vector ydot, void *user_data)
+{
+	N_VectorContent_Serial yContent = (N_VectorContent_Serial) y->content;
+	N_VectorContent_Serial yDotContent = (N_VectorContent_Serial) ydot->content;
+
+	compute_implicit(grid, smc, ec, cpl_cef, t, yContent->data, yDotContent->data);
+	t_stamp.computeDerivatives_call_counter += 1;
+
+	return 0;  // Success.
+}
+
+static int fe(realtype t, N_Vector y, N_Vector ydot, void *user_data)
+{
+	N_VectorContent_Serial yContent = (N_VectorContent_Serial) y->content;
+	N_VectorContent_Serial yDotContent = (N_VectorContent_Serial) ydot->content;
+
+	compute_explicit(grid, smc, ec, cpl_cef, t, yContent->data, yDotContent->data);
 	t_stamp.computeDerivatives_call_counter += 1;
 
 	return 0;  // Success.
@@ -139,7 +164,10 @@ void arkode_solver(double tnow, double tfinal, double interval, double *yInitial
 
 	arkode_mem = ARKodeCreate();
 
+	//flag = ARKodeInit(arkode_mem, fe, fi, tnow, y);
 	flag = ARKodeInit(arkode_mem, f, NULL, tnow, y);
+	flag = ARKBand(arkode_mem, neq, 9, 9); // TODO: try number of equations (9), try 8, maybe 4 - figure this out!!!!
+
 	ark_check_flag(flag, (char *)"ARKodeInit", grid.universal_rank, 0);
 
 	flag = ARKodeSStolerances(arkode_mem, relTOL, absTOL);

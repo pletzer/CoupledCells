@@ -214,7 +214,7 @@ typedef struct {
 	// operation on MPI_COMM_WORLD and the other a Cartesian communicator arising from Cart_create operation.
 	MPI_Comm universe, sub_universe, split_comm, cart_comm;
 
-	int smc_model, ec_model;	// These are placeholders for the selection of model to be simulated in each cell.
+	//int smc_model, ec_model;	// These are placeholders for the selection of model to be simulated in each cell.
 	int NO_path, cGMP_path;	// Specific for Tsoukias model to signal whether to activate NO and cGMP pathways for vasodilation.
 
 	char suffix[16];	// this is for use in the naming convention of the IO files to recognise and record
@@ -369,11 +369,22 @@ void communication_async_send_recv(grid_parms, double**, double**, SMC_cell**, E
 void single_cell(double, double*, grid_parms, SMC_cell**, EC_cell**);
 void coupling(double, double*, grid_parms, SMC_cell**, EC_cell**, conductance);
 void tsoukias_smc(grid_parms, SMC_cell**);
-void koenigsberger_smc(grid_parms, SMC_cell**);
 void tsoukias_smc_derivatives(double*, grid_parms, SMC_cell**);
+
+void koenigsberger_smc(grid_parms, SMC_cell**);
 void koenigsberger_smc_derivatives(double*, grid_parms, SMC_cell**);
 void koenigsberger_ec(grid_parms, EC_cell**);
 void koenigsberger_ec_derivatives(double, double*, grid_parms, EC_cell**);
+
+void koenigsberger_smc_implicit(grid_parms, SMC_cell**);
+void koenigsberger_smc_derivatives_implicit(double*, grid_parms, SMC_cell**);
+void koenigsberger_ec_implicit(grid_parms, EC_cell**);
+void koenigsberger_ec_derivatives_implicit(double, double*, grid_parms, EC_cell**);
+
+void koenigsberger_smc_explicit(grid_parms, SMC_cell**);
+void koenigsberger_smc_derivatives_explicit(double*, grid_parms, SMC_cell**);
+void koenigsberger_ec_explicit(grid_parms, EC_cell**);
+void koenigsberger_ec_derivatives_explicit(double, double*, grid_parms, EC_cell**);
 
 ///Checkpoint functions.
 checkpoint_handle* initialise_checkpoint(grid_parms);
@@ -413,6 +424,8 @@ void odeint_solver(double, double, double, double*, int, double, double, int, ch
 
 int compute_with_time_profiling(time_stamps*, grid_parms, SMC_cell**, EC_cell**, conductance cpl_cef, double, double*, double*);
 int compute(grid_parms, SMC_cell**, EC_cell**, conductance cpl_cef, double, double*, double*);
+int compute_implicit(grid_parms, SMC_cell**, EC_cell**, conductance cpl_cef, double, double*, double*);
+int compute_explicit(grid_parms, SMC_cell**, EC_cell**, conductance cpl_cef, double, double*, double*);
 
 ///These are debugging functions, not used in production runs.
 void print_domains(FILE*, grid_parms, SMC_cell**, EC_cell**);

@@ -16,6 +16,7 @@
 /****** marcos for identifying models ******/
 #define 		KNBGR			0
 #define 		TSK				1
+#define         CELL_MODEL      KNBGR
 
 
 /*******Koenigsberger model*******/
@@ -23,8 +24,8 @@
 #define     smc_Ca              0
 #define     smc_SR              1
 #define     smc_Vm              2
-#define		smc_w				4
-#define     smc_IP3             3
+#define		smc_w				3
+#define     smc_IP3             4
 
 //EC state variables
 #define     ec_Ca               0

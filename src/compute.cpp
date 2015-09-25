@@ -196,110 +196,93 @@ int couplingParms(int CASE, conductance* cpl_cef)
 int map_solver_output_to_cells(grid_parms grid, double* y, SMC_cell** smc, EC_cell** ec)
 {
 	int err = 0;
-	switch (grid.smc_model)
-	{
-	case (TSK): {
-		int k = 0, offset;
-		for (int i = 1; i <= grid.num_smc_circumferentially; i++) {
-			for (int j = 1; j <= grid.num_smc_axially; j++) {
-				if (i > 1)
-					k = ((i - 1) * grid.neq_smc_axially);
-				else if (i == 1)
-					k = 0;
-				smc[i][j].vars[smc_Vm] = y[k + ((j - 1) * grid.neq_smc) + smc_Vm];
-				smc[i][j].vars[smc_d_L] = y[k + ((j - 1) * grid.neq_smc) + smc_d_L];
-				smc[i][j].vars[smc_f_L] = y[k + ((j - 1) * grid.neq_smc) + smc_f_L];
-				smc[i][j].vars[smc_p_f] = y[k + ((j - 1) * grid.neq_smc) + smc_p_f];
-				smc[i][j].vars[smc_p_s] = y[k + ((j - 1) * grid.neq_smc) + smc_p_s];
-				smc[i][j].vars[smc_q_1] = y[k + ((j - 1) * grid.neq_smc) + smc_q_1];
-				smc[i][j].vars[smc_q_2] = y[k + ((j - 1) * grid.neq_smc) + smc_q_2];
-				smc[i][j].vars[smc_p_K] = y[k + ((j - 1) * grid.neq_smc) + smc_p_K];
-				smc[i][j].vars[smc_Ca_u] = y[k + ((j - 1) * grid.neq_smc) + smc_Ca_u];
-				smc[i][j].vars[smc_Ca_r] = y[k + ((j - 1) * grid.neq_smc) + smc_Ca_r];
-				smc[i][j].vars[smc_R_10] = y[k + ((j - 1) * grid.neq_smc) + smc_R_10];
-				smc[i][j].vars[smc_R_11] = y[k + ((j - 1) * grid.neq_smc) + smc_R_11];
-				smc[i][j].vars[smc_R_01] = y[k + ((j - 1) * grid.neq_smc) + smc_R_01];
-				smc[i][j].vars[smc_h_IP3] = y[k + ((j - 1) * grid.neq_smc) + smc_h_IP3];
-				smc[i][j].vars[smc_R_S_G] = y[k + ((j - 1) * grid.neq_smc) + smc_R_S_G];
-				smc[i][j].vars[smc_R_S_P_G] = y[k + ((j - 1) * grid.neq_smc) + smc_R_S_P_G];
-				smc[i][j].vars[smc_G] = y[k + ((j - 1) * grid.neq_smc) + smc_G];
-				smc[i][j].vars[smc_IP3] = y[k + ((j - 1) * grid.neq_smc) + smc_IP3];
-				smc[i][j].vars[smc_PIP2] = y[k + ((j - 1) * grid.neq_smc) + smc_PIP2];
-				smc[i][j].vars[smc_V_cGMP] = y[k + ((j - 1) * grid.neq_smc) + smc_V_cGMP];
-				smc[i][j].vars[smc_cGMP_i] = y[k + ((j - 1) * grid.neq_smc) + smc_cGMP_i];
-				smc[i][j].vars[smc_Ca] = y[k + ((j - 1) * grid.neq_smc) + smc_Ca];
-				smc[i][j].vars[smc_Na_i] = y[k + ((j - 1) * grid.neq_smc) + smc_Na_i];
-				smc[i][j].vars[smc_K_i] = y[k + ((j - 1) * grid.neq_smc) + smc_K_i];
-				smc[i][j].vars[smc_Cl_i] = y[k + ((j - 1) * grid.neq_smc) + smc_Cl_i];
-				smc[i][j].vars[smc_DAG] = y[k + ((j - 1) * grid.neq_smc) + smc_DAG];
-			}
-		}
-		break;
-	}
-	case (KNBGR): {
-		int k = 0, offset;
-		for (int i = 1; i <= grid.num_smc_circumferentially; i++) {
-			for (int j = 1; j <= grid.num_smc_axially; j++) {
-				if (i > 1)
-					k = ((i - 1) * grid.neq_smc_axially);
-				else if (i == 1)
-					k = 0;
-				smc[i][j].vars[smc_Ca] = y[k + ((j - 1) * grid.neq_smc) + smc_Ca];
-				smc[i][j].vars[smc_SR] = y[k + ((j - 1) * grid.neq_smc) + smc_SR];
-				smc[i][j].vars[smc_Vm] = y[k + ((j - 1) * grid.neq_smc) + smc_Vm];
-				smc[i][j].vars[smc_w] = y[k + ((j - 1) * grid.neq_smc) + smc_w];
-				smc[i][j].vars[smc_IP3] =y[k + ((j - 1) * grid.neq_smc) + smc_IP3];
-			}
-		}
-		break;
-	}
-	default: {
-		err = 1;
-		break;
-	}
-	}
-	switch (grid.ec_model) {
-	case (TSK): {
-		int k, offset = (grid.neq_smc * grid.num_smc_circumferentially
-				* grid.num_smc_axially);
+#if CELL_MODEL == TSK
 
-		for (int i = 1; i <= grid.num_ec_circumferentially; i++) {
-			for (int j = 1; j <= grid.num_ec_axially; j++) {
-				if (i > 1)
-					k = offset + ((i - 1) * grid.neq_ec_axially);
-				else if (i == 1)
-					k = offset + 0;
-				ec[i][j].vars[ec_Ca] = y[k + ((j - 1) * grid.neq_ec) + ec_Ca];
-				ec[i][j].vars[ec_SR] = y[k + ((j - 1) * grid.neq_ec) + ec_SR];
-				ec[i][j].vars[ec_Vm] = y[k + ((j - 1) * grid.neq_ec) + ec_Vm];
-				ec[i][j].vars[ec_IP3] = y[k + ((j - 1) * grid.neq_ec) + ec_IP3];
-			}
+	int k = 0, offset;
+	for (int i = 1; i <= grid.num_smc_circumferentially; i++) {
+		for (int j = 1; j <= grid.num_smc_axially; j++) {
+			if (i > 1)
+				k = ((i - 1) * grid.neq_smc_axially);
+			else if (i == 1)
+				k = 0;
+			smc[i][j].vars[smc_Vm] = y[k + ((j - 1) * grid.neq_smc) + smc_Vm];
+			smc[i][j].vars[smc_d_L] = y[k + ((j - 1) * grid.neq_smc) + smc_d_L];
+			smc[i][j].vars[smc_f_L] = y[k + ((j - 1) * grid.neq_smc) + smc_f_L];
+			smc[i][j].vars[smc_p_f] = y[k + ((j - 1) * grid.neq_smc) + smc_p_f];
+			smc[i][j].vars[smc_p_s] = y[k + ((j - 1) * grid.neq_smc) + smc_p_s];
+			smc[i][j].vars[smc_q_1] = y[k + ((j - 1) * grid.neq_smc) + smc_q_1];
+			smc[i][j].vars[smc_q_2] = y[k + ((j - 1) * grid.neq_smc) + smc_q_2];
+			smc[i][j].vars[smc_p_K] = y[k + ((j - 1) * grid.neq_smc) + smc_p_K];
+			smc[i][j].vars[smc_Ca_u] = y[k + ((j - 1) * grid.neq_smc) + smc_Ca_u];
+			smc[i][j].vars[smc_Ca_r] = y[k + ((j - 1) * grid.neq_smc) + smc_Ca_r];
+			smc[i][j].vars[smc_R_10] = y[k + ((j - 1) * grid.neq_smc) + smc_R_10];
+			smc[i][j].vars[smc_R_11] = y[k + ((j - 1) * grid.neq_smc) + smc_R_11];
+			smc[i][j].vars[smc_R_01] = y[k + ((j - 1) * grid.neq_smc) + smc_R_01];
+			smc[i][j].vars[smc_h_IP3] = y[k + ((j - 1) * grid.neq_smc) + smc_h_IP3];
+			smc[i][j].vars[smc_R_S_G] = y[k + ((j - 1) * grid.neq_smc) + smc_R_S_G];
+			smc[i][j].vars[smc_R_S_P_G] = y[k + ((j - 1) * grid.neq_smc) + smc_R_S_P_G];
+			smc[i][j].vars[smc_G] = y[k + ((j - 1) * grid.neq_smc) + smc_G];
+			smc[i][j].vars[smc_IP3] = y[k + ((j - 1) * grid.neq_smc) + smc_IP3];
+			smc[i][j].vars[smc_PIP2] = y[k + ((j - 1) * grid.neq_smc) + smc_PIP2];
+			smc[i][j].vars[smc_V_cGMP] = y[k + ((j - 1) * grid.neq_smc) + smc_V_cGMP];
+			smc[i][j].vars[smc_cGMP_i] = y[k + ((j - 1) * grid.neq_smc) + smc_cGMP_i];
+			smc[i][j].vars[smc_Ca] = y[k + ((j - 1) * grid.neq_smc) + smc_Ca];
+			smc[i][j].vars[smc_Na_i] = y[k + ((j - 1) * grid.neq_smc) + smc_Na_i];
+			smc[i][j].vars[smc_K_i] = y[k + ((j - 1) * grid.neq_smc) + smc_K_i];
+			smc[i][j].vars[smc_Cl_i] = y[k + ((j - 1) * grid.neq_smc) + smc_Cl_i];
+			smc[i][j].vars[smc_DAG] = y[k + ((j - 1) * grid.neq_smc) + smc_DAG];
 		}
-		break;
 	}
-	case (KNBGR): {
-		int k, offset = (grid.neq_smc * grid.num_smc_circumferentially
-				* grid.num_smc_axially);
 
-		for (int i = 1; i <= grid.num_ec_circumferentially; i++) {
-			for (int j = 1; j <= grid.num_ec_axially; j++) {
-				if (i > 1)
-					k = offset + ((i - 1) * grid.neq_ec_axially);
-				else if (i == 1)
-					k = offset + 0;
-				ec[i][j].vars[ec_Ca] = y[k + ((j - 1) * grid.neq_ec) + ec_Ca];
-				ec[i][j].vars[ec_SR] = y[k + ((j - 1) * grid.neq_ec) + ec_SR];
-				ec[i][j].vars[ec_Vm] = y[k + ((j - 1) * grid.neq_ec) + ec_Vm];
-				ec[i][j].vars[ec_IP3] = y[k + ((j - 1) * grid.neq_ec) + ec_IP3];
-			}
+	int k, offset = (grid.neq_smc * grid.num_smc_circumferentially
+					* grid.num_smc_axially);
+
+	for (int i = 1; i <= grid.num_ec_circumferentially; i++) {
+		for (int j = 1; j <= grid.num_ec_axially; j++) {
+			if (i > 1)
+				k = offset + ((i - 1) * grid.neq_ec_axially);
+			else if (i == 1)
+				k = offset + 0;
+			ec[i][j].vars[ec_Ca] = y[k + ((j - 1) * grid.neq_ec) + ec_Ca];
+			ec[i][j].vars[ec_SR] = y[k + ((j - 1) * grid.neq_ec) + ec_SR];
+			ec[i][j].vars[ec_Vm] = y[k + ((j - 1) * grid.neq_ec) + ec_Vm];
+			ec[i][j].vars[ec_IP3] = y[k + ((j - 1) * grid.neq_ec) + ec_IP3];
 		}
-		break;
 	}
-	default: {
-		err = 1;
-		break;
+
+#elif CELL_MODEL == KNBGR
+
+	int k = 0, offset;
+	for (int i = 1; i <= grid.num_smc_circumferentially; i++) {
+		for (int j = 1; j <= grid.num_smc_axially; j++) {
+			if (i > 1)
+				k = ((i - 1) * grid.neq_smc_axially);
+			else if (i == 1)
+				k = 0;
+			smc[i][j].vars[smc_Ca] = y[k + ((j - 1) * grid.neq_smc) + smc_Ca];
+			smc[i][j].vars[smc_SR] = y[k + ((j - 1) * grid.neq_smc) + smc_SR];
+			smc[i][j].vars[smc_Vm] = y[k + ((j - 1) * grid.neq_smc) + smc_Vm];
+			smc[i][j].vars[smc_w] = y[k + ((j - 1) * grid.neq_smc) + smc_w];
+			smc[i][j].vars[smc_IP3] =y[k + ((j - 1) * grid.neq_smc) + smc_IP3];
+		}
 	}
+
+	k, offset = (grid.neq_smc * grid.num_smc_circumferentially
+			* grid.num_smc_axially);
+
+	for (int i = 1; i <= grid.num_ec_circumferentially; i++) {
+		for (int j = 1; j <= grid.num_ec_axially; j++) {
+			if (i > 1)
+				k = offset + ((i - 1) * grid.neq_ec_axially);
+			else if (i == 1)
+				k = offset + 0;
+			ec[i][j].vars[ec_Ca] = y[k + ((j - 1) * grid.neq_ec) + ec_Ca];
+			ec[i][j].vars[ec_SR] = y[k + ((j - 1) * grid.neq_ec) + ec_SR];
+			ec[i][j].vars[ec_Vm] = y[k + ((j - 1) * grid.neq_ec) + ec_Vm];
+			ec[i][j].vars[ec_IP3] = y[k + ((j - 1) * grid.neq_ec) + ec_IP3];
+		}
 	}
+#endif
 
 	return (err);
 }
@@ -326,6 +309,7 @@ void coupling(double t, double y[], grid_parms grid, SMC_cell** smc,
 							+ (smc[i][j].vars[smc_Vm] - smc[i][down].vars[smc_Vm])
 							+ (smc[i][j].vars[smc_Vm] - smc[left][j].vars[smc_Vm])
 							+ (smc[i][j].vars[smc_Vm] - smc[right][j].vars[smc_Vm]));
+
 			smc[i][j].homo_fluxes[cpl_IP3] =
 					-cpl_cef.IP3_hm_smc
 							* ((smc[i][j].vars[smc_IP3] - smc[i][up].vars[smc_IP3])
@@ -467,6 +451,7 @@ void initialize_t_stamp(time_stamps* t_stamp) {
  * \param f
  * \return
  */
+#if 0
 int compute_with_time_profiling(time_stamps* t_stamp, grid_parms grid,
 		SMC_cell** smc, EC_cell** ec, conductance cpl_cef, double t,
 		double* y, double* f) {
@@ -549,92 +534,92 @@ int compute_with_time_profiling(time_stamps* t_stamp, grid_parms grid,
 	}
 	return (err);
 }
+#endif
 
 int compute(grid_parms grid, SMC_cell** smc, EC_cell** ec, conductance cpl_cef,
 		double t, double* y, double* f) {
 	int err;
 
-	// TODO: Is there a reason this mapping is done before the solver is called?
-	// WARNING: Perhaps this mapping should be done outside of this function.
 	map_solver_output_to_cells(grid, y, smc, ec);
+#if CELL_MODEL == TSK
 
-	switch (grid.smc_model)
-	{
-		case (TSK):
-		{
-			tsoukias_smc(grid, smc);
-			break;
-		}
-		case (KNBGR):
-		{
-			koenigsberger_smc(grid, smc);
-			break;
-		}
-		default:
-		{
-			err = 1;
-			break;
-		}
-	}
-
-	switch (grid.ec_model)
-	{
-		case (TSK):
-		{
-			koenigsberger_ec(grid, ec);
-			break;
-		}
-		case (KNBGR):
-		{
-			koenigsberger_ec(grid, ec);
-			break;
-		}
-		default:
-		{
-			err = 1;
-			break;
-		}
-	}
+	tsoukias_smc(grid, smc);
+	koenigsberger_ec(grid, ec);
 
 	coupling(t, y, grid, smc, ec, cpl_cef);
 
-	switch (grid.smc_model)
-	{
-		case (TSK):
-		{
-			tsoukias_smc_derivatives(f, grid, smc);
-			break;
-		}
-		case (KNBGR):
-		{
-			koenigsberger_smc_derivatives(f, grid, smc);
-			break;
-		}
-		default:
-		{
-			err = 1;
-			break;
-		}
-	}
+	tsoukias_smc_derivatives(f, grid, smc);
+	koenigsberger_ec_derivatives(t, f, grid, ec);
 
-	switch (grid.ec_model)
-	{
-		case (TSK):
-		{
-			koenigsberger_ec_derivatives(t, f, grid, ec);
-			break;
-		}
-		case (KNBGR):
-			{
-			koenigsberger_ec_derivatives(t, f, grid, ec);
-			break;
-		}
-		default:
-		{
-			err = 1;
-			break;
-		}
-	}
+#elif CELL_MODEL == KNBGR
+
+	koenigsberger_smc(grid, smc);
+	koenigsberger_ec(grid, ec);
+
+	coupling(t, y, grid, smc, ec, cpl_cef);
+
+	koenigsberger_smc_derivatives(f, grid, smc);
+	koenigsberger_ec_derivatives(t, f, grid, ec);
+#endif
+
+	return (err);
+}
+
+int compute_implicit(grid_parms grid, SMC_cell** smc, EC_cell** ec, conductance cpl_cef,
+		double t, double* y, double* f) {
+	int err;
+
+	map_solver_output_to_cells(grid, y, smc, ec);
+#if CELL_MODEL == TSK
+
+	tsoukias_smc(grid, smc);
+	koenigsberger_ec(grid, ec);
+
+	coupling(t, y, grid, smc, ec, cpl_cef);
+
+	tsoukias_smc_derivatives(f, grid, smc);
+	koenigsberger_ec_derivatives(t, f, grid, ec);
+
+#elif CELL_MODEL == KNBGR
+
+	koenigsberger_smc_implicit(grid, smc);
+	koenigsberger_ec_implicit(grid, ec);
+
+	coupling(t, y, grid, smc, ec, cpl_cef);
+
+	koenigsberger_smc_derivatives_implicit(f, grid, smc);
+	koenigsberger_ec_derivatives_implicit(t, f, grid, ec);
+#endif
+
+	return (err);
+}
+
+int compute_explicit(grid_parms grid, SMC_cell** smc, EC_cell** ec, conductance cpl_cef,
+		double t, double* y, double* f) {
+	int err;
+
+	map_solver_output_to_cells(grid, y, smc, ec);
+#if CELL_MODEL == TSK
+
+	tsoukias_smc(grid, smc);
+	koenigsberger_ec(grid, ec);
+
+	coupling(t, y, grid, smc, ec, cpl_cef);
+
+	tsoukias_smc_derivatives(f, grid, smc);
+	koenigsberger_ec_derivatives(t, f, grid, ec);
+
+#elif CELL_MODEL == KNBGR
+
+	koenigsberger_smc_explicit(grid, smc);
+	koenigsberger_ec_explicit(grid, ec);
+
+	coupling(t, y, grid, smc, ec, cpl_cef);
+
+	koenigsberger_smc_derivatives_explicit(f, grid, smc);
+	koenigsberger_ec_derivatives_explicit(t, f, grid, ec);
+#endif
+
 	return (err);
 }
 

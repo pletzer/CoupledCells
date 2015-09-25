@@ -82,8 +82,6 @@ int main(int argc, char* argv[])
 	int file_write_per_unit_time = (int) (data_writing_frequency * int(1 / interval));
 	grid.NO_path = 0;
 	grid.cGMP_path = 0;
-	grid.smc_model = KNBGR;
-	grid.ec_model = KNBGR;
 	grid.uniform_jplc = 0.3;
 	grid.min_jplc = 0.20;
 	grid.max_jplc = 2.5;
