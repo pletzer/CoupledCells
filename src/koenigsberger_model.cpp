@@ -4,12 +4,14 @@
  *  Created on: 12/06/2013
  *      Author: mohsinshaikh
  */
-
+#include <cstdlib>
 #include <math.h>
+
 
 #include "computelib.h"
 #include "koenigsberger_model.h"
 
+#define RAND_LIMIT 2.0
 double
 	/* Constants for homogenically coupled SMCs. */
       Fi = 0.23,  Kri = 1.00,  GCai = 0.00129,  vCa1 = 100.00,
@@ -47,11 +49,11 @@ void initialize_koeingsberger_smc(grid_parms grid, double* y, SMC_cell** smc)
 				k = ((i - 1) * grid.neq_smc_axially);
 			else if (i == 1)
 				k = 0;
-			y[k + ((j - 1) * grid.neq_smc) + smc_Ca] = 0.191516;
-			y[k + ((j - 1) * grid.neq_smc) + smc_SR] = 1.391122;
-			y[k + ((j - 1) * grid.neq_smc) + smc_Vm] = -66.454924;
-			y[k + ((j - 1) * grid.neq_smc) + smc_w] = 0.010423;
-			y[k + ((j - 1) * grid.neq_smc) + smc_IP3] = 0.750000;
+			y[k + ((j - 1) * grid.neq_smc) + smc_Ca] = (float)rand() / (float)(RAND_MAX / RAND_LIMIT) + 0.1;
+			y[k + ((j - 1) * grid.neq_smc) + smc_SR] = (float)rand() / (float)(RAND_MAX / RAND_LIMIT) + 0.1;
+			y[k + ((j - 1) * grid.neq_smc) + smc_Vm] = (float)rand() / (float)(RAND_MAX / 30.0) - 80.0;
+			y[k + ((j - 1) * grid.neq_smc) + smc_w] = (float)rand() / (float)(RAND_MAX / RAND_LIMIT) + 0.1;
+			y[k + ((j - 1) * grid.neq_smc) + smc_IP3] = (float)rand() / (float)(RAND_MAX / RAND_LIMIT) + 0.1;
 		}
 	}
 
@@ -86,10 +88,10 @@ void initialize_koeingsberger_ec(grid_parms grid, double* y, EC_cell** ec)
 				k = offset + ((i - 1) * grid.neq_ec_axially);
 			else if (i == 1)
 				k = offset + 0;
-			y[k + ((j - 1) * grid.neq_ec) + ec_Ca] = 0.824913;
-			y[k + ((j - 1) * grid.neq_ec) + ec_SR] = 0.629951;
-			y[k + ((j - 1) * grid.neq_ec) + ec_Vm] = -66.815997;
-			y[k + ((j - 1) * grid.neq_ec) + ec_IP3] = 1.050000;
+			y[k + ((j - 1) * grid.neq_ec) + ec_Ca] = (float)rand() / (float)(RAND_MAX / RAND_LIMIT) + 0.1;
+			y[k + ((j - 1) * grid.neq_ec) + ec_SR] = (float)rand() / (float)(RAND_MAX / RAND_LIMIT) + 0.1;
+			y[k + ((j - 1) * grid.neq_ec) + ec_Vm] = (float)rand() / (float)(RAND_MAX / 30.0) - 80.0;
+			y[k + ((j - 1) * grid.neq_ec) + ec_IP3] = (float)rand() / (float)(RAND_MAX / RAND_LIMIT) + 0.1;
 		}
 	}
 	for (int i = 0; i < (grid.num_ec_circumferentially + grid.num_ghost_cells); i++) {
