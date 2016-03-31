@@ -38,6 +38,7 @@ def read_array(arrays, h5_file_name, dataset_name):
         arrays[i % len(attributes)].InsertNextValue(val)
         i += 1
 
+
 def run():
     INPUT_SMC_MESHES = []
 
@@ -65,7 +66,8 @@ def run():
         print "Processing file", h5_file_parent_base
 
 
-        for i in range(1, int(sys.argv[3]) - 1):
+        for i in range(int(sys.argv[3])):
+
             h5_file_parent = h5_file_parent_base[:-4] + str(i) + h5_file_parent_base[-3:]
             
             read_array(array, h5_file_parent, "data")
@@ -74,14 +76,14 @@ def run():
             mesh_parent.GetCellData().AddArray(array[i])
 
         # Append parent.
-        append_filter.AddInput(mesh_parent)
+        append_filter.AddInputData(mesh_parent)
         append_filter.Update()
 
         # Write the result.
         vtp_file = VTP_FILE_BASE_NAME + str(time_step) + '.vtu'
         writer = vtk.vtkXMLUnstructuredGridWriter()
         writer.SetFileName(vtp_file)
-        writer.SetInput(append_filter.GetOutput())
+        writer.SetInputData(append_filter.GetOutput())
         writer.Update()
 
 if __name__ == "__main__":

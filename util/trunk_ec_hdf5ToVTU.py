@@ -74,14 +74,14 @@ def run():
             mesh_parent.GetCellData().AddArray(array[i])
 
         # Append parent.
-        append_filter.AddInput(mesh_parent)
+        append_filter.AddInputData(mesh_parent)
         append_filter.Update()
 
         # Write the result.
         vtp_file = VTP_FILE_BASE_NAME + str(time_step) + '.vtu'
         writer = vtk.vtkXMLUnstructuredGridWriter()
         writer.SetFileName(vtp_file)
-        writer.SetInput(append_filter.GetOutput())
+        writer.SetInputData(append_filter.GetOutput())
         writer.Update()
 
 if __name__ == "__main__":
