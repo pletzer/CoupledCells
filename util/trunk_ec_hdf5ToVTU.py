@@ -46,14 +46,14 @@ def run():
 
     INPUT_EC_MESHES += [reader.GetOutput()]
 
-    for time_step in range(int(sys.argv[1])):
+    for time_step in range(int(sys.argv[1]), int(sys.argv[2]) + 1):
         append_filter = vtk.vtkAppendFilter()
 
         # PARENT.
         mesh_parent = vtk.vtkPolyData()
         mesh_parent.DeepCopy(INPUT_EC_MESHES[0])
 
-        h5_file_parent = H5_FILE_BASE_NAME + str(time_step) + '_b_0.h5'
+        h5_file_parent = H5_FILE_BASE_NAME + str(time_step) + '_b_1.h5'
         print "Processing file", h5_file_parent
 
         ca_array_parent = read_array(h5_file_parent, '/EC_Ca')
@@ -85,19 +85,18 @@ def run():
         mesh_parent.GetCellData().AddArray(sr_array_parent)
 
         # Append parent.
-        append_filter.AddInput(mesh_parent)
+        append_filter.AddInputData(mesh_parent)
         append_filter.Update()
 
         # Write the result.
         vtp_file = VTP_FILE_BASE_NAME + str(time_step) + '.vtu'
         writer = vtk.vtkXMLUnstructuredGridWriter()
         writer.SetFileName(vtp_file)
-        writer.SetInput(append_filter.GetOutput())
+        writer.SetInputData(append_filter.GetOutput())
         writer.Update()
 
 if __name__ == "__main__":
-    if len(sys.argv) != 2:
-        print "Expected arguments: the number of time steps to process."
+    if len(sys.argv) != 3:
+        print "Expected arguments: first and last timesteps to convert between."
     else:
         run()
-

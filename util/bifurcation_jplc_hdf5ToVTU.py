@@ -50,7 +50,7 @@ for files in INPUT_FILES:
 
     ec_mesh.GetCellData().SetScalars(jplcArray)
     if vtk.VTK_MAJOR_VERSION < 6:
-        ecAppend.AddInput(ec_mesh)
+        ecAppend.AddInputData(ec_mesh)
     else:
         ecAppend.AddInputData(ec_mesh)
 
@@ -63,7 +63,7 @@ print 'Writing file', os.path.abspath(outputFileName)
 jplcWriter = vtk.vtkXMLUnstructuredGridWriter()
 jplcWriter.SetFileName(outputFileName)
 if vtk.VTK_MAJOR_VERSION < 6:
-    jplcWriter.SetInput(outputDataset)
+    jplcWriter.SetInputData(outputDataset)
 else:
     jplcWriter.SetInputData(outputDataset)
 jplcWriter.Update()

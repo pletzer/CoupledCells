@@ -174,9 +174,9 @@ def HDF5toVTK(start, end):
 
         # Append parent, left, right.
         if vtk.VTK_MAJOR_VERSION < 6:
-            append_filter.AddInput(mesh_parent)
-            append_filter.AddInput(mesh_left)
-            append_filter.AddInput(mesh_right)
+            append_filter.AddInputData(mesh_parent)
+            append_filter.AddInputData(mesh_left)
+            append_filter.AddInputData(mesh_right)
         else:
             append_filter.AddInputData(mesh_parent)
             append_filter.AddInputData(mesh_left)
@@ -190,7 +190,7 @@ def HDF5toVTK(start, end):
         writer = vtk.vtkXMLUnstructuredGridWriter()
         writer.SetFileName(vtu_file)
         if vtk.VTK_MAJOR_VERSION < 6:
-            writer.SetInput(append_filter.GetOutput())
+            writer.SetInputData(append_filter.GetOutput())
         else:
             writer.SetInputData(append_filter.GetOutput())
         writer.Update()
