@@ -26,7 +26,7 @@ int errcode = (fn); \
 #define P4(x) ((x)*(x)*(x)*(x))
 /** @} */
 
-/****** marcos for identifying models ******/
+/****** macros for identifying models ******/
 #define 		KNBGR			0
 #define 		TSK				1
 

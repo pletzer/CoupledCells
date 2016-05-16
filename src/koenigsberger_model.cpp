@@ -167,14 +167,14 @@ void koenigsberger_smc_implicit(grid_parms grid, SMC_cell** smc)
 	}
 }
 
-void koenigsberger_smc_explicit(grid_parms grid, SMC_cell** smc)
+void koenigsberger_smc_explicit(const grid_parms& grid, SMC_cell** smc)
 {
 	// Evaluate single cell fluxes.
 	for (int i = 1; i <= grid.num_smc_circumferentially; i++) {
 		for (int j = 1; j <= grid.num_smc_axially; j++) {
 
-			double* flxs = smc[i][j].fluxes;
-			const double* vars = smc[i][j].vars;
+			double* const flxs = smc[i][j].fluxes;
+			const double* const vars = smc[i][j].vars;
 			const double vSmc_IP3 = vars[smc_IP3];
 			const double vSmc_Ca = vars[smc_Ca];
 			const double vSmc_SR = vars[smc_SR];
@@ -288,14 +288,14 @@ void koenigsberger_ec_implicit(grid_parms grid, EC_cell** ec)
 	}
 }
 
-void koenigsberger_ec_explicit(grid_parms grid, EC_cell** ec)
+void koenigsberger_ec_explicit(const grid_parms& grid, EC_cell** ec)
 {
 	// Evaluate single cell fluxes.
 	for (int i = 1; i <= grid.num_ec_circumferentially; i++) {
 		for (int j = 1; j <= grid.num_ec_axially; j++) {
 
-			double* flxs = ec[i][j].fluxes;
-			const double* vars = ec[i][j].vars;
+			double* const flxs = ec[i][j].fluxes;
+			const double* const vars = ec[i][j].vars;
 			const double vEc_Ca = vars[ec_Ca];
 			const double vEc_Vm = vars[ec_Vm];
 			const double vEc_SR = vars[ec_SR];
@@ -319,16 +319,16 @@ void koenigsberger_ec_explicit(grid_parms grid, EC_cell** ec)
 
 			//J_NonSelective Cation channels
 			flxs[J_NSC] = (Gcatj * (ECa - vEc_Vm) * 0.5)
-					* (1 + ((double) (tanh((double) ((log10_ec_Ca - m3cat) / m4cat)))));
+					* (1. + tanh( (log10_ec_Ca - m3cat)/m4cat));
 			//BK_channels
-			flxs[J_BK_Ca] =
-					(0.4 / 2)
-							* (1
-									+ (double) (tanh(
-											(double) (((((log10_ec_Ca - c1j) * (vEc_Vm - bj)) - a1j)
-													/ ((m3b * (P2(vEc_Vm+(a2j*(log10_ec_Ca - c1j)) - bj))) + m4b))))));
+			flxs[J_BK_Ca] = (0.4 / 2)
+							* (1. + 
+								tanh(   
+									( (log10_ec_Ca - c1j)*(vEc_Vm - bj) - a1j )
+									   / ( (m3b*P2(vEc_Vm + a2j*(log10_ec_Ca - c1j) - bj)) + m4b))
+								);
 			//SK_channels
-			flxs[J_SK_Ca] = (0.6 / 2) * (1 + (double) (tanh((double) ((log10_ec_Ca - m3s) / m4s))));
+			flxs[J_SK_Ca] = (0.6 / 2) * (1. + tanh((log10_ec_Ca - m3s) / m4s));
 			//Grouping all other trivial Ca fluxes
 			flxs[J_trivial_Ca] = J0j;
 
