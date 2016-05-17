@@ -71,9 +71,9 @@ void koenigsberger_smc_derivatives_implicit(double*, grid_parms, SMC_cell**);
 void koenigsberger_ec_implicit(grid_parms, EC_cell**);
 void koenigsberger_ec_derivatives_implicit(double, double*, grid_parms, EC_cell**);
 
-void koenigsberger_smc_explicit(const grid_parms&, SMC_cell**);
-void koenigsberger_smc_derivatives_explicit(double*, grid_parms, SMC_cell**);
-void koenigsberger_ec_explicit(const grid_parms&, EC_cell**);
-void koenigsberger_ec_derivatives_explicit(double, double*, grid_parms, EC_cell**);
+void koenigsberger_smc_explicit(const grid_parms&, SMC_cell** const);
+void koenigsberger_smc_derivatives_explicit(double*, const grid_parms&, SMC_cell** const);
+void koenigsberger_ec_explicit(const grid_parms&, EC_cell** const);
+void koenigsberger_ec_derivatives_explicit(double, double*, const grid_parms&, EC_cell** const);
 
 #endif /* KOENIGSBERGER_CONSTANTS_H_ */

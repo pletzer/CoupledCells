@@ -10,7 +10,7 @@
 #include "computelib.h"
 #include "koenigsberger_model.h"
 
-double
+const double
 	/* Constants for homogenically coupled SMCs. */
       Fi = 0.23,  Kri = 1.00,  GCai = 0.00129,  vCa1 = 100.00,
 	  vCa2 = -24.00,  RCai = 8.50,  GNaCai = 0.00316,  cNaCai = 0.5,
@@ -239,7 +239,7 @@ void koenigsberger_smc_derivatives_implicit(double* f, grid_parms grid, SMC_cell
 	}
 }
 
-void koenigsberger_smc_derivatives_explicit(double* f, grid_parms grid, SMC_cell** smc)
+void koenigsberger_smc_derivatives_explicit(double* f, const grid_parms& grid, SMC_cell** const smc)
 {
 	int k;
 	for (int i = 1; i <= grid.num_smc_circumferentially; i++) {
@@ -288,8 +288,14 @@ void koenigsberger_ec_implicit(grid_parms grid, EC_cell** ec)
 	}
 }
 
-void koenigsberger_ec_explicit(const grid_parms& grid, EC_cell** ec)
+void koenigsberger_ec_explicit(const grid_parms& grid, EC_cell** const ec)
 {
+
+	const double p4_ccj = P4(ccj);
+	const double p2_Krj = P2(Krj);
+	const double p2_cbj = P2(cbj);
+	const double p2_scj = P2(scj);
+
 	// Evaluate single cell fluxes.
 	for (int i = 1; i <= grid.num_ec_circumferentially; i++) {
 		for (int j = 1; j <= grid.num_ec_axially; j++) {
@@ -311,12 +317,12 @@ void koenigsberger_ec_explicit(const grid_parms& grid, EC_cell** ec)
 			const double p2_ec_SR = P2(vEc_SR);
 
 			//JIP3
-			flxs[J_IP3] = (Fj * p2_ec_IP3) / (P2(Krj) + p2_ec_IP3);
+			flxs[J_IP3] = (Fj * p2_ec_IP3) / (p2_Krj + p2_ec_IP3);
 			//JSRuptake
-			flxs[J_SERCA] = (Bj * p2_ec_Ca) / (p2_ec_Ca + P2(cbj));
+			flxs[J_SERCA] = (Bj * p2_ec_Ca) / (p2_ec_Ca + p2_cbj);
 			//Jcicr
 			flxs[J_CICR] = (CICRj * p2_ec_SR * p4_ec_Ca)
-					/ ((p2_ec_SR + P2(scj))*(p4_ec_Ca + P4(ccj)));
+					/ ((p2_ec_SR + p2_scj)*(p4_ec_Ca + p4_ccj));
 			//Jextrusion
 			flxs[J_Extrusion] = Dj * vEc_Ca;
 			//Jleak
@@ -333,7 +339,7 @@ void koenigsberger_ec_explicit(const grid_parms& grid, EC_cell** ec)
 							* (1. + 
 								tanh(   
 									( (log10_ec_Ca - c1j)*(vEc_Vm - bj) - a1j )
-									/ ( (m3b*P2(vEc_Vm + a2j*(log10_ec_Ca - c1j) - bj)) + m4b))
+									/ ( m3b*P2(vEc_Vm + a2j*(log10_ec_Ca - c1j) - bj) + m4b))
 								);
 			//SK_channels
 			flxs[J_SK_Ca] = (0.6 / 2) * (1. + tanh((log10_ec_Ca - m3s) / m4s));
@@ -385,7 +391,7 @@ void koenigsberger_ec_derivatives_implicit(double t, double* f, grid_parms grid,
 	}
 }
 
-void koenigsberger_ec_derivatives_explicit(double t, double* f, grid_parms grid, EC_cell** ec)
+void koenigsberger_ec_derivatives_explicit(double t, double* f, const grid_parms& grid, EC_cell** const ec)
 {
 	int k, offset = (grid.neq_smc * grid.num_smc_circumferentially * grid.num_smc_axially);
 	for(int i = 1; i <= grid.num_ec_circumferentially; i++)

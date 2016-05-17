@@ -210,7 +210,7 @@ void set_coupling_parms(int CASE, conductance* cpl_cef)
 
 // TODO: Move the Tsoukias code to the appropriate location.
 // Mapping from state variable vector to cells.
-int map_solver_output_to_cells(grid_parms grid, double* y, SMC_cell** smc, EC_cell** ec)
+int map_solver_output_to_cells(const grid_parms& grid, double* y, SMC_cell** const smc, EC_cell** const ec)
 {
 	int err = 0;
 	switch (grid.smc_model)
@@ -398,7 +398,7 @@ void coupling_implicit(double t, double y[], grid_parms grid, SMC_cell** smc, EC
 	}
 }
 
-void coupling_explicit(double t, double y[], grid_parms grid, SMC_cell** smc, EC_cell** ec, conductance cpl_cef)
+void coupling_explicit(double t, double y[], const grid_parms& grid, SMC_cell** const smc, EC_cell** const ec, const conductance& cpl_cef)
 {
 	int i, j, k, l;
 
@@ -495,7 +495,7 @@ void coupling(double t, double y[], grid_parms grid, SMC_cell** smc, EC_cell** e
 }
 
 
-void compute(grid_parms grid, SMC_cell** smc, EC_cell** ec, conductance cpl_cef, double t, double* y, double* f)
+void compute(const grid_parms& grid, SMC_cell** const smc, EC_cell** const ec, const conductance& cpl_cef, double t, double* y, double* f)
 {
 	int err;
 
