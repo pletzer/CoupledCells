@@ -190,6 +190,7 @@ void koenigsberger_smc_explicit(const grid_parms& grid, SMC_cell** smc)
 			const double p4_smc_Ca = P4(vSmc_Ca);
 			const double p2_smc_IP3 = P2(vSmc_IP3);
 			const double p2_smc_SR = P2(vSmc_SR);
+			const double p2_smc_Ca_plus_cwi = P2(vSmc_Ca + cwi);
 
 			//JIP3
 			flxs[J_IP3] = (Fi * p2_smc_IP3) / (p2_Kri + p2_smc_IP3);
@@ -208,7 +209,7 @@ void koenigsberger_smc_explicit(const grid_parms& grid, SMC_cell** smc)
 			//J Na/Ca
 			flxs[J_Na_Ca] = GNaCai * vSmc_Ca * (vSmc_Vm - vNaCai) / (vSmc_Ca + cNaCai);
 			//Kactivation
-			flxs[K_activation] = P2(vSmc_Ca + cwi) / (P2(vSmc_Ca + cwi) + beta * exp(-(vSmc_Vm - vCa3) / RKi));
+			flxs[K_activation] = p2_smc_Ca_plus_cwi / (p2_smc_Ca_plus_cwi + beta * exp(-(vSmc_Vm - vCa3) / RKi));
 			//Jdegradation
 			flxs[J_IP3_deg] = ki * vSmc_IP3;
 		}
