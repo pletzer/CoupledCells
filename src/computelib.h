@@ -209,7 +209,7 @@ void compute(const grid_parms&, SMC_cell** const, EC_cell** const, const conduct
 void compute_implicit(grid_parms, SMC_cell**, EC_cell**, conductance cpl_cef, double, double*, double*);
 void compute_explicit(grid_parms, SMC_cell**, EC_cell**, conductance cpl_cef, double, double*, double*);
 void coupling(double, double*, grid_parms, SMC_cell**, EC_cell**, conductance);
-void coupling_implicit(double, double*, grid_parms, SMC_cell**, EC_cell**, conductance);
+void coupling_implicit(double, double*, const grid_parms&, SMC_cell** const, EC_cell** const, const conductance&);
 void coupling_explicit(double, double*, const grid_parms&, SMC_cell** const, EC_cell** const, const conductance&);
 
 // Solver wrapper functions.

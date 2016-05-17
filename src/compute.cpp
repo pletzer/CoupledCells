@@ -322,7 +322,7 @@ int map_solver_output_to_cells(const grid_parms& grid, double* y, SMC_cell** con
 	return (err);
 }
 
-void coupling_implicit(double t, double y[], grid_parms grid, SMC_cell** smc, EC_cell** ec, conductance cpl_cef)
+void coupling_implicit(double t, double y[], const grid_parms& grid, SMC_cell** const smc, EC_cell** const ec, const conductance& cpl_cef)
 {
 	int i, j, k, l;
 
