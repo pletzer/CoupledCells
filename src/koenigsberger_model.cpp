@@ -296,10 +296,13 @@ void koenigsberger_ec_explicit(const grid_parms& grid, EC_cell** ec)
 
 			double* const flxs = ec[i][j].fluxes;
 			const double* const vars = ec[i][j].vars;
+			const double vJPLC = ec[i][j].JPLC;
+
 			const double vEc_Ca = vars[ec_Ca];
 			const double vEc_Vm = vars[ec_Vm];
 			const double vEc_SR = vars[ec_SR];
 			const double vEc_IP3 = vars[ec_IP3];
+			const double vEc_Gprot = vars[ec_Gprot];
 			const double log10_ec_Ca = log10(vEc_Ca);
 
 			const double p2_ec_Ca = P2(vEc_Ca);
@@ -338,10 +341,10 @@ void koenigsberger_ec_explicit(const grid_parms& grid, EC_cell** ec)
 			flxs[J_trivial_Ca] = J0j;
 
 			// Ratio of bound to total P2Y
-			flxs[L_P_P2Y] = ec[i][j].JPLC / (ec[i][j].JPLC + kATP); // TODO: Does this need to be calculated every time? is JPLC constant?
+			flxs[L_P_P2Y] = vJPLC / (vJPLC + kATP); // TODO: Does this need to be calculated every time? is JPLC constant?
 
 			// Rate of PIP2 hydrolysis.
-			flxs[R_PIP2_H] = alpha_j * (vEc_Ca / (vEc_Ca + KCa)) * ec[i][j].vars[ec_Gprot];
+			flxs[R_PIP2_H] = alpha_j * (vEc_Ca / (vEc_Ca + KCa)) * vEc_Gprot;
 
 			// Induced IP3 influx
 			flxs[J_ind_I] = (flxs[R_PIP2_H] * cons_PIP2 * unitcon_a) / (N_a * V_ec);
