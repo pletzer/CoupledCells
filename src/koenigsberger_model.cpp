@@ -169,6 +169,12 @@ void koenigsberger_smc_implicit(const grid_parms& grid, SMC_cell** smc)
 
 void koenigsberger_smc_explicit(const grid_parms& grid, SMC_cell** smc)
 {
+	
+	const double p2_cbi = P2(cbi);
+	const double p2_sci = P2(sci);
+	const double p2_Kri = P2(Kri);
+	const double p4_cci = P4(cci);
+
 	// Evaluate single cell fluxes.
 	for (int i = 1; i <= grid.num_smc_circumferentially; i++) {
 		for (int j = 1; j <= grid.num_smc_axially; j++) {
@@ -180,16 +186,18 @@ void koenigsberger_smc_explicit(const grid_parms& grid, SMC_cell** smc)
 			const double vSmc_SR = vars[smc_SR];
 			const double vSmc_Vm = vars[smc_Vm];
 
+			const double p2_smc_Ca = P2(vSmc_Ca);
+			const double p4_smc_Ca = P4(vSmc_Ca);
+			const double p2_smc_IP3 = P2(vSmc_IP3);
+			const double p2_smc_SR = P2(vSmc_SR);
+
 			//JIP3
-			flxs[J_IP3] = (Fi * P2(vSmc_IP3)) / (P2(Kri) + P2(vSmc_IP3));
+			flxs[J_IP3] = (Fi * p2_smc_IP3) / (p2_Kri + p2_smc_IP3);
 			//JSRuptake
-			flxs[J_SERCA] = (Bi * P2(vSmc_Ca)) / (P2(
-					vSmc_Ca) + P2(cbi));
+			flxs[J_SERCA] = (Bi * p2_smc_Ca) / (p2_smc_Ca + p2_cbi);
 			//Jcicr
-			flxs[J_CICR] = (CICRi * (P2(vSmc_SR) * P4(
-					vSmc_Ca))) / ((P2(sci) + P2(vSmc_SR))
-			* (P4(cci)+ P4(
-							vSmc_Ca)));
+			flxs[J_CICR] = (CICRi * (p2_smc_SR * p4_smc_Ca)) / ((p2_sci + p2_smc_SR)
+			* (p4_cci + p4_smc_Ca));
 			//Jextrusion
 			flxs[J_Extrusion] = Di * vSmc_Ca * (1. + ((vSmc_Vm - vdi) / Rdi));
 
@@ -200,8 +208,7 @@ void koenigsberger_smc_explicit(const grid_parms& grid, SMC_cell** smc)
 			//J Na/Ca
 			flxs[J_Na_Ca] = GNaCai * vSmc_Ca * (vSmc_Vm - vNaCai) / (vSmc_Ca + cNaCai);
 			//Kactivation
-			flxs[K_activation] = P2(vSmc_Ca + cwi) / (P2(
-					vSmc_Ca + cwi) + beta * exp(-(vSmc_Vm - vCa3) / RKi));
+			flxs[K_activation] = P2(vSmc_Ca + cwi) / (P2(vSmc_Ca + cwi) + beta * exp(-(vSmc_Vm - vCa3) / RKi));
 			//Jdegradation
 			flxs[J_IP3_deg] = ki * vSmc_IP3;
 		}
