@@ -302,13 +302,18 @@ void koenigsberger_ec_explicit(const grid_parms& grid, EC_cell** ec)
 			const double vEc_IP3 = vars[ec_IP3];
 			const double log10_ec_Ca = log10(vEc_Ca);
 
+			const double p2_ec_Ca = P2(vEc_Ca);
+			const double p4_ec_Ca = P4(vEc_Ca);
+			const double p2_ec_IP3 = P2(vEc_IP3);
+			const double p2_ec_SR = P2(vEc_SR);
+
 			//JIP3
-			flxs[J_IP3] = (Fj * P2(vEc_IP3)) / (P2(Krj) + P2(vEc_IP3));
+			flxs[J_IP3] = (Fj * p2_ec_IP3) / (P2(Krj) + p2_ec_IP3);
 			//JSRuptake
-			flxs[J_SERCA] = (Bj * P2(vEc_Ca)) / (P2(vEc_Ca) + P2(cbj));
+			flxs[J_SERCA] = (Bj * p2_ec_Ca) / (p2_ec_Ca + P2(cbj));
 			//Jcicr
-			flxs[J_CICR] = (CICRj * P2(vEc_SR) * P4(vEc_Ca))
-					/ ((P2(vEc_SR) + P2(scj))*(P4(vEc_Ca)+P4(ccj)));
+			flxs[J_CICR] = (CICRj * p2_ec_SR * p4_ec_Ca)
+					/ ((p2_ec_SR + P2(scj))*(p4_ec_Ca + P4(ccj)));
 			//Jextrusion
 			flxs[J_Extrusion] = Dj * vEc_Ca;
 			//Jleak
@@ -325,7 +330,7 @@ void koenigsberger_ec_explicit(const grid_parms& grid, EC_cell** ec)
 							* (1. + 
 								tanh(   
 									( (log10_ec_Ca - c1j)*(vEc_Vm - bj) - a1j )
-									   / ( (m3b*P2(vEc_Vm + a2j*(log10_ec_Ca - c1j) - bj)) + m4b))
+									/ ( (m3b*P2(vEc_Vm + a2j*(log10_ec_Ca - c1j) - bj)) + m4b))
 								);
 			//SK_channels
 			flxs[J_SK_Ca] = (0.6 / 2) * (1. + tanh((log10_ec_Ca - m3s) / m4s));
