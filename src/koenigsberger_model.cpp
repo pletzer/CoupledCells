@@ -179,8 +179,8 @@ void koenigsberger_smc_explicit(const grid_parms& grid, SMC_cell** smc)
 	for (int i = 1; i <= grid.num_smc_circumferentially; i++) {
 		for (int j = 1; j <= grid.num_smc_axially; j++) {
 
-			double* const flxs = smc[i][j].fluxes;
-			const double* const vars = smc[i][j].vars;
+			double* flxs = smc[i][j].fluxes;
+			const double* vars = smc[i][j].vars;
 			const double vSmc_IP3 = vars[smc_IP3];
 			const double vSmc_Ca = vars[smc_Ca];
 			const double vSmc_SR = vars[smc_SR];
@@ -308,8 +308,8 @@ void koenigsberger_ec_explicit(const grid_parms& grid, EC_cell** ec)
 	for (int i = 1; i <= grid.num_ec_circumferentially; i++) {
 		for (int j = 1; j <= grid.num_ec_axially; j++) {
 
-			double* const flxs = ec[i][j].fluxes;
-			const double* const vars = ec[i][j].vars;
+			double* flxs = ec[i][j].fluxes;
+			const double* vars = ec[i][j].vars;
 			const double vJPLC = ec[i][j].JPLC;
 
 			const double vEc_Ca = vars[ec_Ca];
