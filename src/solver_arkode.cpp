@@ -14,8 +14,8 @@
 
 
 extern conductance cpl_cef;
-extern SMC_cell** smc;
-extern EC_cell** ec;
+extern SMC_cell* smc;
+extern EC_cell* ec;
 extern double **sendbuf, **recvbuf;
 extern grid_parms grid;
 extern time_stamps t_stamp;
@@ -187,11 +187,15 @@ void arkode_solver(double tnow, double tfinal, double interval, double *yInitial
 
 	// Reset JPLC to the uniform map.
 	// The input file will have to be read later when the time is right.
+	const int nc = grid.num_ec_circumferentially;
+	const int na = grid.num_ec_axially;
+	const int ng = grid.num_ghost_cells;
 	for (int i = 1; i <= grid.num_ec_circumferentially; i++)
 	{
 		for (int j = 1; j <= grid.num_ec_axially; j++)
 		{
-			ec[i][j].JPLC = grid.uniform_jplc;
+			int ij = i*(na + ng) + j;
+			ec[ij].JPLC = grid.uniform_jplc;
 		}
 	}
 

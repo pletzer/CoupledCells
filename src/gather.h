@@ -51,12 +51,12 @@ void free_EC_data_buffer(ec_data_buffer *smc_buffer, int deep);
 void free_SMC_data_buffer(smc_data_buffer *smc_buffer, int deep);
 
 /* Collect state variables from the EC cells in one branch. */
-void gather_EC_data(grid_parms *grid, ec_data_buffer *ec_buffer, EC_cell **ec);
+void gather_EC_data(grid_parms *grid, ec_data_buffer *ec_buffer, EC_cell* ec);
 
 /* Collect state variables from the SMC cells in one branch. */
-void gather_SMC_data(grid_parms *grid, smc_data_buffer *smc_buffer, SMC_cell **smc);
+void gather_SMC_data(grid_parms *grid, smc_data_buffer *smc_buffer, SMC_cell* smc);
 
 /* Collect JPLC values from the EC cells in one branch. */
-void gather_JPLC(grid_parms* grid, double *jplc_buffer, EC_cell** ec);
+void gather_JPLC(grid_parms* grid, double *jplc_buffer, EC_cell* ec);
 
 #endif

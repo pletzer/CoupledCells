@@ -196,22 +196,22 @@ typedef struct
 void set_task_parameters(grid_parms *);
 void make_bifucation_cart_grids(grid_parms *);
 void make_straight_cart_grid(grid_parms *);
-void read_init_ATP(grid_parms *grid, EC_cell **ECs);
+void read_init_ATP(grid_parms *grid, EC_cell* ECs);
 void set_coupling_parms(int CASE, conductance* cpl_cef);
 
 void determine_source_destination(grid_parms, int*, int*);
 void communication_update_recv_size(grid_parms *);
-void communication_update_sendbuf(grid_parms, double**, SMC_cell**, EC_cell**);
-void communication_update_recvbuf(grid_parms, double**, SMC_cell**, EC_cell**);
-void communication_async_send_recv(grid_parms, double**, double**, SMC_cell**, EC_cell**);
+void communication_update_sendbuf(grid_parms, double**, SMC_cell*, EC_cell*);
+void communication_update_recvbuf(grid_parms, double**, SMC_cell*, EC_cell*);
+void communication_async_send_recv(grid_parms, double**, double**, SMC_cell*, EC_cell*);
 
 //Cell dynamics evaluation handlers. These contain the ODEs for representative models from different sources.
-void compute(const grid_parms&, SMC_cell**, EC_cell**, const conductance& cpl_cef, double, double*, double*);
-void compute_implicit(const grid_parms&, SMC_cell**, EC_cell**, const conductance& cpl_cef, double, double*, double*);
-void compute_explicit(const grid_parms&, SMC_cell**, EC_cell**, const conductance& cpl_cef, double, double*, double*);
-void coupling(double, double*, const grid_parms&, SMC_cell**, EC_cell**, const conductance&);
-void coupling_implicit(double, double*, const grid_parms&, SMC_cell**, EC_cell**, const conductance&);
-void coupling_explicit(double, double*, const grid_parms&, SMC_cell**, EC_cell**, const conductance&);
+void compute(const grid_parms&, SMC_cell*, EC_cell*, const conductance& cpl_cef, double, double*, double*);
+void compute_implicit(const grid_parms&, SMC_cell*, EC_cell*, const conductance& cpl_cef, double, double*, double*);
+void compute_explicit(const grid_parms&, SMC_cell*, EC_cell*, const conductance& cpl_cef, double, double*, double*);
+void coupling(double, double*, const grid_parms&, SMC_cell*, EC_cell*, const conductance&);
+void coupling_implicit(double, double*, const grid_parms&, SMC_cell*, EC_cell*, const conductance&);
+void coupling_explicit(double, double*, const grid_parms&, SMC_cell*, EC_cell*, const conductance&);
 
 // Solver wrapper functions.
 #ifdef RK_SUITE
@@ -224,14 +224,14 @@ void arkode_solver(double, double, double, double*, int, double, double, int, ch
 void odeint_solver(double, double, double, double*, int, double, double, int, char*);
 #endif
 
-int map_solver_output_to_cells(const grid_parms&, double*, SMC_cell**, EC_cell**);
+int map_solver_output_to_cells(const grid_parms&, double*, SMC_cell*, EC_cell*);
 
 ///These are debugging functions, not used in production runs.
 void dump_rank_info(conductance, grid_parms);
-void print_domains(FILE*, grid_parms, SMC_cell**, EC_cell**);
+void print_domains(FILE*, grid_parms, SMC_cell*, EC_cell*);
 void print_send_buffer(FILE*, grid_parms, double**);
 void print_recv_buffer(FILE*, grid_parms, double**);
-void print_compare(double, double*, grid_parms, SMC_cell**, EC_cell**);
+void print_compare(double, double*, grid_parms, SMC_cell*, EC_cell*);
 
 void initialize_t_stamp(time_stamps*);
 void dump_time_profiling(grid_parms grid, time_stamps* t_stamp);
