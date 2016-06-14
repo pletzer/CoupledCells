@@ -164,20 +164,15 @@ typedef struct
 {
 	double *vars;		///storage for the state variables corresponding to an SMC.
 	double NO, NE, I_stim;		///specific to Tsoukias model
-	int node_row, node_col;	///stores coordinates of the node on which I am located.
-	int my_row, my_col;		///stores my location on the node.
 	double* fluxes;			    ///stores single cell fluxes
 	double* homo_fluxes;			    ///stores homogeneous coupling fluxes
 	double* hetero_fluxes;			    ///stores heterogeneous coupling fluxes
-	int cell_index[4];
 	conductance cpl_cef;
 } SMC_cell;
 
 typedef struct
 {
 	double *vars;		///storage for the state variables corresponding to an SMC.
-	int node_row, node_col;	///stores coordinates of the node on which I am located.
-	int my_row, my_col;		///stores my location on the node.
 	double* fluxes;			    ///stores single cell fluxes
 	double* homo_fluxes;			    ///stores homogeneous coupling fluxes
 	double* hetero_fluxes;			    ///stores heterogeneous coupling fluxes
@@ -187,40 +182,62 @@ typedef struct
 
 class Cell_type {
 public:
-	Cell_type(int num_circumferentially, int num_axially, int num_vars, int num_fluxes) {
+	Cell_type(int num_circumferentially, int num_axially, int num_vars, 
+		      int num_fluxes, int num_coupling_species) {
 		_nc = num_circumferentially;
 		_na = num_axially;
 		_nv = num_vars;
 		_nf = num_fluxes;
-		_ntot = (_nv + _nf) * _na * _nc;
+		_ncs = num_coupling_species;
+		_ntot = (_nv + _nf + 2*_ncs) * _na * _nc;
 		this->data = new double[_ntot];
 	}
-	~Cell_type() {
+	virtual ~Cell_type() {
 		delete this->data;
 	}
-	inline void setFlux(int i, int j, int k, double val) {
+	inline void set_var(int i, int j, int k, double val) {
 		this->data[this->getFlatIndex(i, j) + k] = val;
 	}
-	inline void setVar(int i, int j, int k, double val) {
-		this->data[this->getFlatIndex(i, j) + _nf + k] = val;
+	inline void set_flux(int i, int j, int k, double val) {
+		this->data[this->getFlatIndex(i, j) + k + _nv] = val;
 	}
-	inline const double getFlux(int i, int j, int k) const {
+	inline void set_homo_flux(int i, int j, int k, double val) {
+		this->data[this->getFlatIndex(i, j) + k + _nv + _nf] = val;
+	}
+	inline void set_hetero_flux(int i, int j, int k, double val) {
+		this->data[this->getFlatIndex(i, j) + k + _nv + _nf + _ncs] = val;
+	}
+
+	inline const double get_var(int i, int j, int k) const {
 		return this->data[this->getFlatIndex(i, j) + k];
 	}
-	inline const double getVar(int i, int j, int k) const {
-		return this->data[this->getFlatIndex(i, j) + _nf + k];
+	inline const double get_flux(int i, int j, int k) const {
+		return this->data[this->getFlatIndex(i, j) + k + _nv];
+	}
+	inline const double get_homo_flux(int i, int j, int k) const {
+		return this->data[this->getFlatIndex(i, j) + k + _nv + _nf];
+	}
+	inline const double get_hetero_flux(int i, int j, int k) const {
+		return this->data[this->getFlatIndex(i, j) + k + _nv + _nf + _ncs];
 	}
 
 private:
 	double* data;
 	int _nc;
 	int _na;
-	int _nf;
 	int _nv;
+	int _nf;
+	int _ncs;
 	int _ntot;
+protected:
 	inline int getFlatIndex(int i, int j) const {
-		return (_nv + _nf) * (j + _na*i);
+		return (_nv + _nf + 2*_ncs) * (_na*i + j);
 	}
+};
+
+class EC_type : public Cell_type {
+public:
+
 };
 
 typedef struct
