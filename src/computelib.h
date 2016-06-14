@@ -185,6 +185,44 @@ typedef struct
 	conductance cpl_cef;
 } EC_cell;
 
+class Cell_type {
+public:
+	Cell_type(int num_circumferentially, int num_axially, int num_vars, int num_fluxes) {
+		_nc = num_circumferentially;
+		_na = num_axially;
+		_nv = num_vars;
+		_nf = num_fluxes;
+		_ntot = (_nv + _nf) * _na * _nc;
+		this->data = new double[_ntot];
+	}
+	~Cell_type() {
+		delete this->data;
+	}
+	inline void setFlux(int i, int j, int k, double val) {
+		this->data[this->getFlatIndex(i, j) + k] = val;
+	}
+	inline void setVar(int i, int j, int k, double val) {
+		this->data[this->getFlatIndex(i, j) + _nf + k] = val;
+	}
+	inline const double getFlux(int i, int j, int k) const {
+		return this->data[this->getFlatIndex(i, j) + k];
+	}
+	inline const double getVar(int i, int j, int k) const {
+		return this->data[this->getFlatIndex(i, j) + _nf + k];
+	}
+
+private:
+	double* data;
+	int _nc;
+	int _na;
+	int _nf;
+	int _nv;
+	int _ntot;
+	inline int getFlatIndex(int i, int j) const {
+		return (_nv + _nf) * (j + _na*i);
+	}
+};
+
 typedef struct
 {
 	double aggregate_compute, aggregate_comm;
