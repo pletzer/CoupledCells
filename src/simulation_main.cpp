@@ -11,8 +11,8 @@
 void read_config_file(grid_parms* grid);
 
 conductance cpl_cef;
-SMC_type& smc;
-EC_type& ec;
+SMC_type smc;
+EC_type ec;
 double **sendbuf, **recvbuf;
 grid_parms grid;
 
@@ -173,43 +173,21 @@ int main(int argc, char* argv[])
 \endverbatim
 */
 
-	smc = (SMC_type& ) checked_malloc((grid.num_smc_circumferentially + grid.num_ghost_cells) * sizeof(SMC_cell*), SRC_LOC);
-	for (int i = 0; i < (grid.num_smc_circumferentially + grid.num_ghost_cells); i++)
-	{
-		smc[i] = (SMC_cell*) checked_malloc((grid.num_smc_axially + grid.num_ghost_cells) * sizeof(SMC_cell), SRC_LOC);
-	}
-
-	ec = (EC_type& ) checked_malloc((grid.num_ec_circumferentially + grid.num_ghost_cells) * sizeof(EC_cell*), SRC_LOC);
-	for (int i = 0; i < (grid.num_ec_circumferentially + grid.num_ghost_cells); i++)
-	{
-		ec[i] = (EC_cell*) checked_malloc((grid.num_ec_axially + grid.num_ghost_cells) * sizeof(EC_cell), SRC_LOC);
-	}
-
 	/// Memory allocation for state vectors (the RHS of the ODEs for each cell) and coupling fluxes.
+	const int nc2 = grid.num_smc_circumferentially + grid.num_ghost_cells;
+	const int na2 = grid.num_smc_axially + grid.num_ghost_cells;
 
 	/// SMC domain.
-	for (int i = 0; i < (grid.num_smc_circumferentially + grid.num_ghost_cells); i++)
-	{
-		for (int j = 0; j < (grid.num_smc_axially + grid.num_ghost_cells); j++)
-		{
-			smc[i][j].vars = (double*) checked_malloc(grid.neq_smc * sizeof(double), SRC_LOC);
-			smc[i][j].fluxes = (double*) checked_malloc(grid.num_fluxes_smc * sizeof(double), SRC_LOC);
-			smc[i][j].homo_fluxes = (double*) checked_malloc(grid.num_coupling_species_smc * sizeof(double), SRC_LOC);
-			smc[i][j].hetero_fluxes = (double*) checked_malloc(grid.num_coupling_species_smc * sizeof(double), SRC_LOC);
-		}
-	}
+	int nv = grid.neq_smc;
+	int nf = grid.num_fluxes_smc;
+	int ncs = grid.num_coupling_species_smc;
+	smc.build(nc2, na2, nv, nf, ncs);
 
 	/// EC domain.
-	for (int i = 0; i < (grid.num_ec_circumferentially + grid.num_ghost_cells); i++)
-	{
-		for (int j = 0; j < (grid.num_ec_axially + grid.num_ghost_cells); j++)
-		{
-			ec[i][j].vars = (double*) checked_malloc(grid.neq_ec * sizeof(double), SRC_LOC);
-			ec[i][j].fluxes = (double*) checked_malloc(grid.num_fluxes_ec * sizeof(double), SRC_LOC);
-			ec[i][j].homo_fluxes = (double*) checked_malloc(grid.num_coupling_species_ec * sizeof(double), SRC_LOC);
-			ec[i][j].hetero_fluxes = (double*) checked_malloc(grid.num_coupling_species_ec * sizeof(double), SRC_LOC);
-		}
-	}
+	nv = grid.neq_ec;
+	nf = grid.num_fluxes_ec;
+	ncs = grid.num_coupling_species_ec;
+	ec.build(nc2, na2, nv, nf, ncs);
 
 	/// Allocating memory for coupling data to be sent and received through MPI.
 	/// sendbuf and recvbuf are 2D arrays with up, down, left and right directions as their first dimension.
@@ -365,32 +343,10 @@ int main(int argc, char* argv[])
 
 
 	// Free SMCs.
-	for (int i = 0; i < (grid.num_smc_circumferentially + grid.num_ghost_cells); i++)
-	{
-		for (int j = 0; j < (grid.num_smc_axially + grid.num_ghost_cells); j++)
-		{
-			free(smc[i][j].vars);
-			free(smc[i][j].fluxes);
-			free(smc[i][j].homo_fluxes);
-			free(smc[i][j].hetero_fluxes);
-		}
-		free(smc[i]);
-	}
-	free(smc);
+	smc.destroy();
 
 	// Free ECs.
-	for (int i = 0; i < (grid.num_ec_circumferentially + grid.num_ghost_cells); i++)
-	{
-		for (int j = 0; j < (grid.num_ec_axially + grid.num_ghost_cells); j++)
-		{
-			free(ec[i][j].vars);
-			free(ec[i][j].fluxes);
-			free(ec[i][j].homo_fluxes);
-			free(ec[i][j].hetero_fluxes);
-		}
-		free(ec[i]);
-	}
-	free(ec);
+	ec.destroy();
 
 	// Free send/receive buffers.
 	for (int i = 0; i < 4; i++)

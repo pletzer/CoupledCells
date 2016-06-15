@@ -183,20 +183,31 @@ typedef struct
 
 class Cell_type {
 public:
-	Cell_type(int num_circumferentially, int num_axially, int num_vars, 
-		      int num_fluxes, int num_coupling_species) {
+	Cell_type() {
+		_nc = -1;
+		_na = -1;
+		_nv = -1;
+		_nf = -1;
+		_ncs = -1;
+		this->data = 0;
+	}
+	virtual ~Cell_type() {
+		this->destroy();
+	}
+	void build(int num_circumferentially, 
+		       int num_axially, 
+		       int num_vars, 
+		       int num_fluxes, 
+		       int num_coupling_species) {
 		_nc = num_circumferentially;
 		_na = num_axially;
 		_nv = num_vars;
 		_nf = num_fluxes;
 		_ncs = num_coupling_species;
-		this->data = 0;
-	}
-	virtual ~Cell_type() {
-		if(this->data) delete[] this->data;
-	}
-	void build() {
 		this->data = new double[_nc * _na * (_nv + _nf + 2*_ncs)];
+	}
+	void destroy() {
+		if (this->data) delete[] this->data;
 	}
 	inline double& var(int i, int j, int k) {
 		return this->data[this->getFlatIndex(i, j) + k];
@@ -226,9 +237,21 @@ protected:
 class EC_type : public Cell_type {
 public:
 	std::vector<double> jplc;
-	void build() {
-		Cell_type::build();
+	void build(int num_circumferentially, 
+		       int num_axially, 
+		       int num_vars, 
+		       int num_fluxes, 
+		       int num_coupling_species) {
+		Cell_type::build(num_circumferentially, 
+		                 num_axially, 
+		                 num_vars, 
+		                 num_fluxes, 
+		                 num_coupling_species);
 		this->jplc.resize(_nc * _na);
+	}
+	void destroy() {
+		Cell_type::destroy();
+		this->jplc.resize(0);
 	}
 	inline double& JPLC(int i, int j) {
 		return this->jplc[this->getFlatIndex(i, j)];
@@ -238,10 +261,23 @@ public:
 class SMC_type : public Cell_type {
 public:
 	std::vector<double> no, ne;
-	void build() {
-		Cell_type::build();
+	void build(int num_circumferentially, 
+		       int num_axially, 
+		       int num_vars, 
+		       int num_fluxes, 
+		       int num_coupling_species) {
+		Cell_type::build(num_circumferentially, 
+		                 num_axially, 
+		                 num_vars, 
+		                 num_fluxes, 
+		                 num_coupling_species);
 		this->no.resize(_nc * _na);
 		this->ne.resize(_nc * _na);
+	}
+	void destroy() {
+		Cell_type::destroy();
+		this->no.resize(0);		
+		this->ne.resize(0);		
 	}
 	inline double& NO(int i, int j) {
 		return this->no[this->getFlatIndex(i, j)];
