@@ -48,7 +48,7 @@ void free_EC_data_buffer(ec_data_buffer *ec_buffer, int deep)
 	return;
 }
 
-void gather_EC_data(grid_parms *grid, ec_data_buffer *ec_buffer, EC_cell **ec)
+void gather_EC_data(grid_parms *grid, ec_data_buffer *ec_buffer, EC_type& ec)
 {
 	// printf("[%d] ++++++ Entering %s:%s\n", grid->universal_rank, __FILE__, __FUNCTION__);
 
@@ -199,7 +199,7 @@ void free_SMC_data_buffer(smc_data_buffer *smc_buffer, int deep)
 }
 
 /* Collect state variables from the SMC cells in one branch. */
-void gather_SMC_data(grid_parms *grid, smc_data_buffer *smc_buffer, SMC_cell **smc)
+void gather_SMC_data(grid_parms *grid, smc_data_buffer *smc_buffer, SMC_type& smc)
 {
 	// printf("[%d] ++++++ Entering %s:%s\n", grid->universal_rank, __FILE__, __FUNCTION__);
 
@@ -308,7 +308,7 @@ void gather_SMC_data(grid_parms *grid, smc_data_buffer *smc_buffer, SMC_cell **s
 /*
  * Collect JPLC for each cart grid into an array on the writing cores.
  */
-void gather_JPLC(grid_parms* grid, double *jplc_buffer, EC_cell** ec)
+void gather_JPLC(grid_parms* grid, double *jplc_buffer, EC_type&  ec)
 {
 	// printf("[%d] ++++++ Entering %s:%s\n", grid->universal_rank, __FILE__, __FUNCTION__);
 

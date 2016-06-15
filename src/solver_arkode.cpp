@@ -14,8 +14,8 @@
 
 
 extern conductance cpl_cef;
-extern SMC_cell** smc;
-extern EC_cell** ec;
+extern SMC_type&  smc;
+extern EC_type&  ec;
 extern double **sendbuf, **recvbuf;
 extern grid_parms grid;
 extern time_stamps t_stamp;
@@ -191,7 +191,7 @@ void arkode_solver(double tnow, double tfinal, double interval, double *yInitial
 	{
 		for (int j = 1; j <= grid.num_ec_axially; j++)
 		{
-			ec[i][j].JPLC = grid.uniform_jplc;
+			ec.JPLC(i, j) = grid.uniform_jplc;
 		}
 	}
 

@@ -58,22 +58,22 @@
 #define	    cpl_Vm		        1
 #define	    cpl_IP3		        2
 
-void initialize_koenigsberger_smc(const grid_parms&, double*, SMC_cell**);
-void initialize_koenigsberger_ec(const grid_parms&, double*, EC_cell**);
+void initialize_koenigsberger_smc(const grid_parms&, double*, SMC_type& );
+void initialize_koenigsberger_ec(const grid_parms&, double*, EC_type& );
 
-void koenigsberger_smc(const grid_parms&, SMC_cell**);
-void koenigsberger_smc_derivatives(double*, const grid_parms&, SMC_cell**);
-void koenigsberger_ec(const grid_parms&, EC_cell**);
-void koenigsberger_ec_derivatives(double, double*, const grid_parms&, EC_cell**);
+void koenigsberger_smc(const grid_parms&, SMC_type& );
+void koenigsberger_smc_derivatives(double*, const grid_parms&, SMC_type& );
+void koenigsberger_ec(const grid_parms&, EC_type& );
+void koenigsberger_ec_derivatives(double, double*, const grid_parms&, EC_type& );
 
-void koenigsberger_smc_implicit(const grid_parms&, SMC_cell**);
-void koenigsberger_smc_derivatives_implicit(double*, const grid_parms&, SMC_cell**);
-void koenigsberger_ec_implicit(const grid_parms&, EC_cell**);
-void koenigsberger_ec_derivatives_implicit(double, double*, const grid_parms&, EC_cell**);
+void koenigsberger_smc_implicit(const grid_parms&, SMC_type& );
+void koenigsberger_smc_derivatives_implicit(double*, const grid_parms&, SMC_type& );
+void koenigsberger_ec_implicit(const grid_parms&, EC_type& );
+void koenigsberger_ec_derivatives_implicit(double, double*, const grid_parms&, EC_type& );
 
-void koenigsberger_smc_explicit(const grid_parms&, SMC_cell**);
-void koenigsberger_smc_derivatives_explicit(double*, const grid_parms&, SMC_cell**);
-void koenigsberger_ec_explicit(const grid_parms&, EC_cell**);
-void koenigsberger_ec_derivatives_explicit(double, double*, const grid_parms&, EC_cell**);
+void koenigsberger_smc_explicit(const grid_parms&, SMC_type& );
+void koenigsberger_smc_derivatives_explicit(double*, const grid_parms&, SMC_type& );
+void koenigsberger_ec_explicit(const grid_parms&, EC_type& );
+void koenigsberger_ec_derivatives_explicit(double, double*, const grid_parms&, EC_type& );
 
 #endif /* KOENIGSBERGER_CONSTANTS_H_ */

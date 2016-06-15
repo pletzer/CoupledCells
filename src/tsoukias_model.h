@@ -100,8 +100,8 @@
 #define	    cpl_Vm		        1
 #define	    cpl_IP3		        2
 
-void initialize_tsoukias_smc(grid_parms grid, double y[], SMC_cell** smc);
-void tsoukias_smc(grid_parms, SMC_cell**);
-void tsoukias_smc_derivatives(double*, grid_parms, SMC_cell**);
+void initialize_tsoukias_smc(grid_parms grid, double y[], SMC_type&  smc);
+void tsoukias_smc(grid_parms, SMC_type& );
+void tsoukias_smc_derivatives(double*, grid_parms, SMC_type& );
 
 #endif /* TSOUKIAS_CONSTANTS_H_ */

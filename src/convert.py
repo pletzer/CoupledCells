@@ -15,7 +15,6 @@ pats = {
 
 
 for file in glob.glob('*.h') + glob.glob('*.cpp'):
-	if file == 'computelib.h': continue
 	print(file)
 	newf = open(file + '.new', 'w')
 	for line in open(file).readlines():

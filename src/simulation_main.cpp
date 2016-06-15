@@ -11,8 +11,8 @@
 void read_config_file(grid_parms* grid);
 
 conductance cpl_cef;
-SMC_cell **smc;
-EC_cell **ec;
+SMC_type& smc;
+EC_type& ec;
 double **sendbuf, **recvbuf;
 grid_parms grid;
 
@@ -173,13 +173,13 @@ int main(int argc, char* argv[])
 \endverbatim
 */
 
-	smc = (SMC_cell**) checked_malloc((grid.num_smc_circumferentially + grid.num_ghost_cells) * sizeof(SMC_cell*), SRC_LOC);
+	smc = (SMC_type& ) checked_malloc((grid.num_smc_circumferentially + grid.num_ghost_cells) * sizeof(SMC_cell*), SRC_LOC);
 	for (int i = 0; i < (grid.num_smc_circumferentially + grid.num_ghost_cells); i++)
 	{
 		smc[i] = (SMC_cell*) checked_malloc((grid.num_smc_axially + grid.num_ghost_cells) * sizeof(SMC_cell), SRC_LOC);
 	}
 
-	ec = (EC_cell**) checked_malloc((grid.num_ec_circumferentially + grid.num_ghost_cells) * sizeof(EC_cell*), SRC_LOC);
+	ec = (EC_type& ) checked_malloc((grid.num_ec_circumferentially + grid.num_ghost_cells) * sizeof(EC_cell*), SRC_LOC);
 	for (int i = 0; i < (grid.num_ec_circumferentially + grid.num_ghost_cells); i++)
 	{
 		ec[i] = (EC_cell*) checked_malloc((grid.num_ec_axially + grid.num_ghost_cells) * sizeof(EC_cell), SRC_LOC);

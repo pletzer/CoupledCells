@@ -86,7 +86,7 @@ void communication_update_recv_size(grid_parms *grid)
 }
 
 // Carry out asynchronous communication send and receive of edge cell data.
-void communication_async_send_recv(grid_parms grid, double** sendbuf, double** recvbuf, SMC_cell** smc, EC_cell** ec)
+void communication_async_send_recv(grid_parms grid, double** sendbuf, double** recvbuf, SMC_type&  smc, EC_type&  ec)
 {
 	/// 8 MPI variables of types Request and Status are declared.
 	/// 4 of each are for sending information to 4 neighbours and the other 4 are to retrive the receive operation status.
@@ -146,7 +146,7 @@ void communication_async_send_recv(grid_parms grid, double** sendbuf, double** r
 
 // Prepare the sendbuf by putting ECs's and SMCs's edge data to be sent to the neighbours's ghost cells.
 // Specific to KNBGR.
-void communication_update_sendbuf(grid_parms grid, double** sendbuf, SMC_cell** smc, EC_cell** ec)
+void communication_update_sendbuf(grid_parms grid, double** sendbuf, SMC_type&  smc, EC_type&  ec)
 {
 	int k, buf_offset;
 
@@ -157,9 +157,9 @@ void communication_update_sendbuf(grid_parms grid, double** sendbuf, SMC_cell** 
 	k = 0;
 	for (int i = (int) sendbuf[UP][0]; i <= (int) sendbuf[UP][1]; i++) {
 		int j = 1;
-		sendbuf[UP][buf_offset + k + 0] = smc[i][j].vars[smc_Ca];
-		sendbuf[UP][buf_offset + k + 1] = smc[i][j].vars[smc_Vm];
-		sendbuf[UP][buf_offset + k + 2] = smc[i][j].vars[smc_IP3];
+		sendbuf[UP][buf_offset + k + 0] = smc.var(i, j, smc_Ca);
+		sendbuf[UP][buf_offset + k + 1] = smc.var(i, j, smc_Vm);
+		sendbuf[UP][buf_offset + k + 2] = smc.var(i, j, smc_IP3);
 		k += grid.num_coupling_species_smc;
 	}
 
@@ -168,9 +168,9 @@ void communication_update_sendbuf(grid_parms grid, double** sendbuf, SMC_cell** 
 	k = 0;
 	for (int i = (int) sendbuf[UP][2]; i <= (int) sendbuf[UP][3]; i++) {
 		int j = 1;
-		sendbuf[UP][buf_offset + k + 0] = ec[i][j].vars[ec_Ca];
-		sendbuf[UP][buf_offset + k + 1] = ec[i][j].vars[ec_Vm];
-		sendbuf[UP][buf_offset + k + 2] = ec[i][j].vars[ec_IP3];
+		sendbuf[UP][buf_offset + k + 0] = ec.var(i, j, ec_Ca);
+		sendbuf[UP][buf_offset + k + 1] = ec.var(i, j, ec_Vm);
+		sendbuf[UP][buf_offset + k + 2] = ec.var(i, j, ec_IP3);
 		k += grid.num_coupling_species_ec;
 	}
 
@@ -181,9 +181,9 @@ void communication_update_sendbuf(grid_parms grid, double** sendbuf, SMC_cell** 
 	k = 0;
 	for (int i = (int) sendbuf[DOWN][0]; i <= (int) sendbuf[DOWN][1]; i++) {
 		int j = grid.num_smc_axially;
-		sendbuf[DOWN][buf_offset + k + 0] = smc[i][j].vars[smc_Ca];
-		sendbuf[DOWN][buf_offset + k + 1] = smc[i][j].vars[smc_Vm];
-		sendbuf[DOWN][buf_offset + k + 2] = smc[i][j].vars[smc_IP3];
+		sendbuf[DOWN][buf_offset + k + 0] = smc.var(i, j, smc_Ca);
+		sendbuf[DOWN][buf_offset + k + 1] = smc.var(i, j, smc_Vm);
+		sendbuf[DOWN][buf_offset + k + 2] = smc.var(i, j, smc_IP3);
 		k += grid.num_coupling_species_smc;
 	}
 
@@ -192,9 +192,9 @@ void communication_update_sendbuf(grid_parms grid, double** sendbuf, SMC_cell** 
 	k = 0;
 	for (int i = (int) sendbuf[DOWN][2]; i <= (int) sendbuf[DOWN][3]; i++) {
 		int j = grid.num_ec_axially;
-		sendbuf[DOWN][buf_offset + k + 0] = ec[i][j].vars[ec_Ca];
-		sendbuf[DOWN][buf_offset + k + 1] = ec[i][j].vars[ec_Vm];
-		sendbuf[DOWN][buf_offset + k + 2] = ec[i][j].vars[ec_IP3];
+		sendbuf[DOWN][buf_offset + k + 0] = ec.var(i, j, ec_Ca);
+		sendbuf[DOWN][buf_offset + k + 1] = ec.var(i, j, ec_Vm);
+		sendbuf[DOWN][buf_offset + k + 2] = ec.var(i, j, ec_IP3);
 		k += grid.num_coupling_species_ec;
 	}
 
@@ -205,9 +205,9 @@ void communication_update_sendbuf(grid_parms grid, double** sendbuf, SMC_cell** 
 	k = 0;
 	for (int j = (int) sendbuf[LEFT][0]; j <= (int) sendbuf[LEFT][1]; j++) {
 		int i = 1;
-		sendbuf[LEFT][buf_offset + k + 0] = smc[i][j].vars[smc_Ca];
-		sendbuf[LEFT][buf_offset + k + 1] = smc[i][j].vars[smc_Vm];
-		sendbuf[LEFT][buf_offset + k + 2] = smc[i][j].vars[smc_IP3];
+		sendbuf[LEFT][buf_offset + k + 0] = smc.var(i, j, smc_Ca);
+		sendbuf[LEFT][buf_offset + k + 1] = smc.var(i, j, smc_Vm);
+		sendbuf[LEFT][buf_offset + k + 2] = smc.var(i, j, smc_IP3);
 		k += grid.num_coupling_species_smc;
 	}
 
@@ -216,9 +216,9 @@ void communication_update_sendbuf(grid_parms grid, double** sendbuf, SMC_cell** 
 	k = 0;
 	for (int j = (int) sendbuf[LEFT][2]; j <= (int) sendbuf[LEFT][3]; j++) {
 		int i = 1;
-		sendbuf[LEFT][buf_offset + k + 0] = ec[i][j].vars[ec_Ca];
-		sendbuf[LEFT][buf_offset + k + 1] = ec[i][j].vars[ec_Vm];
-		sendbuf[LEFT][buf_offset + k + 2] = ec[i][j].vars[ec_IP3];
+		sendbuf[LEFT][buf_offset + k + 0] = ec.var(i, j, ec_Ca);
+		sendbuf[LEFT][buf_offset + k + 1] = ec.var(i, j, ec_Vm);
+		sendbuf[LEFT][buf_offset + k + 2] = ec.var(i, j, ec_IP3);
 		k += grid.num_coupling_species_ec;
 	}
 
@@ -229,9 +229,9 @@ void communication_update_sendbuf(grid_parms grid, double** sendbuf, SMC_cell** 
 	k = 0;
 	for (int j = (int) sendbuf[RIGHT][0]; j <= (int) sendbuf[RIGHT][1]; j++) {
 		int i = grid.num_smc_circumferentially;
-		sendbuf[RIGHT][buf_offset + k + 0] = smc[i][j].vars[smc_Ca];
-		sendbuf[RIGHT][buf_offset + k + 1] = smc[i][j].vars[smc_Vm];
-		sendbuf[RIGHT][buf_offset + k + 2] = smc[i][j].vars[smc_IP3];
+		sendbuf[RIGHT][buf_offset + k + 0] = smc.var(i, j, smc_Ca);
+		sendbuf[RIGHT][buf_offset + k + 1] = smc.var(i, j, smc_Vm);
+		sendbuf[RIGHT][buf_offset + k + 2] = smc.var(i, j, smc_IP3);
 		k += grid.num_coupling_species_smc;
 	}
 
@@ -240,9 +240,9 @@ void communication_update_sendbuf(grid_parms grid, double** sendbuf, SMC_cell** 
 	k = 0;
 	for (int j = (int) sendbuf[RIGHT][2]; j <= (int) sendbuf[RIGHT][3]; j++) {
 		int i = grid.num_ec_circumferentially;
-		sendbuf[RIGHT][buf_offset + k + 0] = ec[i][j].vars[ec_Ca];
-		sendbuf[RIGHT][buf_offset + k + 1] = ec[i][j].vars[ec_Vm];
-		sendbuf[RIGHT][buf_offset + k + 2] = ec[i][j].vars[ec_IP3];
+		sendbuf[RIGHT][buf_offset + k + 0] = ec.var(i, j, ec_Ca);
+		sendbuf[RIGHT][buf_offset + k + 1] = ec.var(i, j, ec_Vm);
+		sendbuf[RIGHT][buf_offset + k + 2] = ec.var(i, j, ec_IP3);
 		k += grid.num_coupling_species_ec;
 	}
 }
@@ -251,7 +251,7 @@ void communication_update_sendbuf(grid_parms grid, double** sendbuf, SMC_cell** 
  Unpack received data into ghost cells.
  Specific to KNBGR.
 */
-void communication_update_recvbuf(grid_parms grid, double** recvbuf, SMC_cell** smc, EC_cell** ec)
+void communication_update_recvbuf(grid_parms grid, double** recvbuf, SMC_type&  smc, EC_type&  ec)
 {
 	int k, buf_offset;
 
@@ -262,9 +262,9 @@ void communication_update_recvbuf(grid_parms grid, double** recvbuf, SMC_cell** 
 	k = 0;
 	for (int i = (int) recvbuf[UP][0]; i <= (int) recvbuf[UP][1]; i++) {
 		int j = 0;
-		smc[i][j].vars[smc_Ca] = recvbuf[UP][buf_offset + k + 0];
-		smc[i][j].vars[smc_Vm] = recvbuf[UP][buf_offset + k + 1];
-		smc[i][j].vars[smc_IP3] = recvbuf[UP][buf_offset + k + 2];
+		smc.var(i, j, smc_Ca) = recvbuf[UP][buf_offset + k + 0];
+		smc.var(i, j, smc_Vm) = recvbuf[UP][buf_offset + k + 1];
+		smc.var(i, j, smc_IP3) = recvbuf[UP][buf_offset + k + 2];
 		k += grid.num_coupling_species_smc;
 	}
 
@@ -273,9 +273,9 @@ void communication_update_recvbuf(grid_parms grid, double** recvbuf, SMC_cell** 
 	k = 0;
 	for (int i = (int) recvbuf[UP][2]; i <= (int) recvbuf[UP][3]; i++) {
 		int j = 0;
-		ec[i][j].vars[ec_Ca] = recvbuf[UP][buf_offset + k + 0];
-		ec[i][j].vars[ec_Vm] = recvbuf[UP][buf_offset + k + 1];
-		ec[i][j].vars[ec_IP3] = recvbuf[UP][buf_offset + k + 2];
+		ec.var(i, j, ec_Ca) = recvbuf[UP][buf_offset + k + 0];
+		ec.var(i, j, ec_Vm) = recvbuf[UP][buf_offset + k + 1];
+		ec.var(i, j, ec_IP3) = recvbuf[UP][buf_offset + k + 2];
 		k += grid.num_coupling_species_ec;
 	}
 
@@ -290,9 +290,9 @@ void communication_update_recvbuf(grid_parms grid, double** recvbuf, SMC_cell** 
 	{
 		for (int i = (int) recvbuf[DOWN][0]; i <= (int) recvbuf[DOWN][1]; i++) {
 			int j = grid.num_smc_axially + 1;
-			smc[i][j].vars[smc_Ca] = recvbuf[DOWN][buf_offset + k + 0];
-			smc[i][j].vars[smc_Vm] = recvbuf[DOWN][buf_offset + k + 1];
-			smc[i][j].vars[smc_IP3] = recvbuf[DOWN][buf_offset + k + 2];
+			smc.var(i, j, smc_Ca) = recvbuf[DOWN][buf_offset + k + 0];
+			smc.var(i, j, smc_Vm) = recvbuf[DOWN][buf_offset + k + 1];
+			smc.var(i, j, smc_IP3) = recvbuf[DOWN][buf_offset + k + 2];
 			k += grid.num_coupling_species_smc;
 		}
 	}
@@ -301,9 +301,9 @@ void communication_update_recvbuf(grid_parms grid, double** recvbuf, SMC_cell** 
 		int start = (int) recvbuf[DOWN][0], end = (int) recvbuf[DOWN][1];
 		for (int i = end; i >= start; i--) {
 			int j = grid.num_smc_axially + 1;
-			smc[i][j].vars[smc_Ca] = recvbuf[DOWN][buf_offset + k + 0];
-			smc[i][j].vars[smc_Vm] = recvbuf[DOWN][buf_offset + k + 1];
-			smc[i][j].vars[smc_IP3] = recvbuf[DOWN][buf_offset + k + 2];
+			smc.var(i, j, smc_Ca) = recvbuf[DOWN][buf_offset + k + 0];
+			smc.var(i, j, smc_Vm) = recvbuf[DOWN][buf_offset + k + 1];
+			smc.var(i, j, smc_IP3) = recvbuf[DOWN][buf_offset + k + 2];
 			k += grid.num_coupling_species_smc;
 		}
 	}
@@ -315,9 +315,9 @@ void communication_update_recvbuf(grid_parms grid, double** recvbuf, SMC_cell** 
 		for (int i = (int) recvbuf[DOWN][2]; i <= (int) recvbuf[DOWN][3];
 				i++) {
 			int j = grid.num_ec_axially + 1;
-			ec[i][j].vars[ec_Ca] = recvbuf[DOWN][buf_offset + k + 0];
-			ec[i][j].vars[ec_Vm] = recvbuf[DOWN][buf_offset + k + 1];
-			ec[i][j].vars[ec_IP3] = recvbuf[DOWN][buf_offset + k + 2];
+			ec.var(i, j, ec_Ca) = recvbuf[DOWN][buf_offset + k + 0];
+			ec.var(i, j, ec_Vm) = recvbuf[DOWN][buf_offset + k + 1];
+			ec.var(i, j, ec_IP3) = recvbuf[DOWN][buf_offset + k + 2];
 			k += grid.num_coupling_species_ec;
 		}
 
@@ -325,9 +325,9 @@ void communication_update_recvbuf(grid_parms grid, double** recvbuf, SMC_cell** 
 		int start = (int) recvbuf[DOWN][2], end = (int) recvbuf[DOWN][3];
 		for (int i = end; i >= start; i--) {
 			int j = grid.num_ec_axially + 1;
-			ec[i][j].vars[ec_Ca] = recvbuf[DOWN][buf_offset + k + 0];
-			ec[i][j].vars[ec_Vm] = recvbuf[DOWN][buf_offset + k + 1];
-			ec[i][j].vars[ec_IP3] = recvbuf[DOWN][buf_offset + k + 2];
+			ec.var(i, j, ec_Ca) = recvbuf[DOWN][buf_offset + k + 0];
+			ec.var(i, j, ec_Vm) = recvbuf[DOWN][buf_offset + k + 1];
+			ec.var(i, j, ec_IP3) = recvbuf[DOWN][buf_offset + k + 2];
 			k += grid.num_coupling_species_ec;
 		}
 	}
@@ -339,9 +339,9 @@ void communication_update_recvbuf(grid_parms grid, double** recvbuf, SMC_cell** 
 	k = 0;
 	for (int j = (int) recvbuf[LEFT][0]; j <= (int) recvbuf[LEFT][1]; j++) {
 		int i = 0;
-		smc[i][j].vars[smc_Ca] = recvbuf[LEFT][buf_offset + k + 0];
-		smc[i][j].vars[smc_Vm] = recvbuf[LEFT][buf_offset + k + 1];
-		smc[i][j].vars[smc_IP3] = recvbuf[LEFT][buf_offset + k + 2];
+		smc.var(i, j, smc_Ca) = recvbuf[LEFT][buf_offset + k + 0];
+		smc.var(i, j, smc_Vm) = recvbuf[LEFT][buf_offset + k + 1];
+		smc.var(i, j, smc_IP3) = recvbuf[LEFT][buf_offset + k + 2];
 		k += grid.num_coupling_species_smc;
 	}
 
@@ -350,9 +350,9 @@ void communication_update_recvbuf(grid_parms grid, double** recvbuf, SMC_cell** 
 	k = 0;
 	for (int j = (int) recvbuf[LEFT][2]; j <= (int) recvbuf[LEFT][3]; j++) {
 		int i = 0;
-		ec[i][j].vars[ec_Ca] = recvbuf[LEFT][buf_offset + k + 0];
-		ec[i][j].vars[ec_Vm] = recvbuf[LEFT][buf_offset + k + 1];
-		ec[i][j].vars[ec_IP3] = recvbuf[LEFT][buf_offset + k + 2];
+		ec.var(i, j, ec_Ca) = recvbuf[LEFT][buf_offset + k + 0];
+		ec.var(i, j, ec_Vm) = recvbuf[LEFT][buf_offset + k + 1];
+		ec.var(i, j, ec_IP3) = recvbuf[LEFT][buf_offset + k + 2];
 		k += grid.num_coupling_species_ec;
 	}
 
@@ -363,9 +363,9 @@ void communication_update_recvbuf(grid_parms grid, double** recvbuf, SMC_cell** 
 	k = 0;
 	for (int j = (int) recvbuf[RIGHT][0]; j <= (int) recvbuf[RIGHT][1]; j++) {
 		int i = grid.num_smc_circumferentially + 1;
-		smc[i][j].vars[smc_Ca] = recvbuf[RIGHT][buf_offset + k + 0];
-		smc[i][j].vars[smc_Vm] = recvbuf[RIGHT][buf_offset + k + 1];
-		smc[i][j].vars[smc_IP3] = recvbuf[RIGHT][buf_offset + k + 2];
+		smc.var(i, j, smc_Ca) = recvbuf[RIGHT][buf_offset + k + 0];
+		smc.var(i, j, smc_Vm) = recvbuf[RIGHT][buf_offset + k + 1];
+		smc.var(i, j, smc_IP3) = recvbuf[RIGHT][buf_offset + k + 2];
 		k += grid.num_coupling_species_smc;
 	}
 
@@ -374,14 +374,14 @@ void communication_update_recvbuf(grid_parms grid, double** recvbuf, SMC_cell** 
 	k = 0;
 	for (int j = (int) recvbuf[RIGHT][2]; j <= (int) recvbuf[RIGHT][3]; j++) {
 		int i = grid.num_ec_circumferentially + 1;
-		ec[i][j].vars[ec_Ca] = recvbuf[RIGHT][buf_offset + k + 0];
-		ec[i][j].vars[ec_Vm] = recvbuf[RIGHT][buf_offset + k + 1];
-		ec[i][j].vars[ec_IP3] = recvbuf[RIGHT][buf_offset + k + 2];
+		ec.var(i, j, ec_Ca) = recvbuf[RIGHT][buf_offset + k + 0];
+		ec.var(i, j, ec_Vm) = recvbuf[RIGHT][buf_offset + k + 1];
+		ec.var(i, j, ec_IP3) = recvbuf[RIGHT][buf_offset + k + 2];
 		k += grid.num_coupling_species_ec;
 	}
 }
 
-void read_init_ATP(grid_parms *grid, EC_cell **ECs)
+void read_init_ATP(grid_parms *grid, EC_type& ECs)
 {
 	int branch;
 	if (grid->domain_type == STRSEG)
@@ -467,7 +467,7 @@ void read_init_ATP(grid_parms *grid, EC_cell **ECs)
 		for(int n = 1; n <= grid->num_ec_axially; n++)
 		{
 			// Fortran array referencing!
-			ECs[m][n].JPLC = recv_jplc[(n - 1) * grid->num_ec_circumferentially + m - 1];
+			ECs.JPLC(m, n) = recv_jplc[(n - 1) * grid->num_ec_circumferentially + m - 1];
 		}
 	}
 
