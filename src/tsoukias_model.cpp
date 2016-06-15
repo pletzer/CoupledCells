@@ -252,7 +252,7 @@ void Initialize_tsoukias_smc(grid_parms grid, double y[], SMC_type&  smc)
 
 				smc.NE(i, j) = 0.0;	//mM
 				smc.NO(i, j) = 0.0;	//nM
-				smc[i][j].I_stim = 0.0;	//pA
+				//smc[i][j].I_stim = 0.0;	//pA
 			}
 		}
 
