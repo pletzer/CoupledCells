@@ -174,16 +174,18 @@ int main(int argc, char* argv[])
 */
 
 	/// Memory allocation for state vectors (the RHS of the ODEs for each cell) and coupling fluxes.
-	const int nc2 = grid.num_smc_circumferentially + grid.num_ghost_cells;
-	const int na2 = grid.num_smc_axially + grid.num_ghost_cells;
 
 	/// SMC domain.
+	int nc2 = grid.num_smc_circumferentially + grid.num_ghost_cells;
+	int na2 = grid.num_smc_axially + grid.num_ghost_cells;
 	int nv = grid.neq_smc;
 	int nf = grid.num_fluxes_smc;
 	int ncs = grid.num_coupling_species_smc;
 	smc.build(nc2, na2, nv, nf, ncs);
 
 	/// EC domain.
+	nc2 = grid.num_ec_circumferentially + grid.num_ghost_cells;
+	na2 = grid.num_ec_axially + grid.num_ghost_cells;
 	nv = grid.neq_ec;
 	nf = grid.num_fluxes_ec;
 	ncs = grid.num_coupling_species_ec;
