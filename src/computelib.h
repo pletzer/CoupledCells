@@ -198,29 +198,16 @@ public:
 	void build() {
 		this->data = new double[_nc * _na * (_nv + _nf + 2*_ncs)];
 	}
-	inline void set_var(int i, int j, int k, double val) {
-		this->data[this->getFlatIndex(i, j) + k] = val;
-	}
-	inline void set_flux(int i, int j, int k, double val) {
-		this->data[this->getFlatIndex(i, j) + k + _nv] = val;
-	}
-	inline void set_homo_flux(int i, int j, int k, double val) {
-		this->data[this->getFlatIndex(i, j) + k + _nv + _nf] = val;
-	}
-	inline void set_hetero_flux(int i, int j, int k, double val) {
-		this->data[this->getFlatIndex(i, j) + k + _nv + _nf + _ncs] = val;
-	}
-
-	inline const double get_var(int i, int j, int k) const {
+	inline double& var(int i, int j, int k) {
 		return this->data[this->getFlatIndex(i, j) + k];
 	}
-	inline const double get_flux(int i, int j, int k) const {
+	inline double& flux(int i, int j, int k) {
 		return this->data[this->getFlatIndex(i, j) + k + _nv];
 	}
-	inline const double get_homo_flux(int i, int j, int k) const {
+	inline double& homo_flux(int i, int j, int k) {
 		return this->data[this->getFlatIndex(i, j) + k + _nv + _nf];
 	}
-	inline const double get_hetero_flux(int i, int j, int k) const {
+	inline double& hetero_flux(int i, int j, int k, double val) {
 		return this->data[this->getFlatIndex(i, j) + k + _nv + _nf + _ncs];
 	}
 
