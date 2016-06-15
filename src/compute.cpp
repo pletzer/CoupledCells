@@ -332,23 +332,17 @@ void coupling_implicit(double t, double y[],
 #pragma omp parallel for
         for (int ij = 0; ij < grid.num_smc_circumferentially * grid.num_smc_axially; ij++) {
 	        int i = ij / grid.num_smc_axially + 1;
-                int j = ij % grid.num_smc_axially + 1;
-		const double vSmc_Vm = smc.var(i, j, smc_Vm);
-		int up = j - 1, down = j + 1, left = i - 1, right = i + 1;
-                const double* __restrict__ vars = smc[i][j].vars;
-                const double* __restrict__ upVars = smc[i][up].vars;
-                const double* __restrict__ downVars = smc[i][down].vars;
-                const double* __restrict__ leftVars = smc[left][j].vars;
-                const double* __restrict__ rightVars = smc[right][j].vars;
-                const double var = vars[smc_Vm];
-                const double upVar = upVars[smc_Vm];
-                const double downVar = downVars[smc_Vm];
-                const double leftVar =  leftVars[smc_Vm];
-                const double rightVar = rightVars[smc_Vm];
-                const double* __restrict__ diffusion = cpl_cef.smc_diffusion;
-                double* __restrict__ homo_fluxes = smc[i][j].homo_fluxes;
+            int j = ij % grid.num_smc_axially + 1;
+		    const double vSmc_Vm = smc.var(i, j, smc_Vm);
+		    int up = j - 1, down = j + 1, left = i - 1, right = i + 1;
+            const double var = smc.var(i, j, smc_Vm);
+            const double upVar = smc.var(i, up, smc_Vm);
+            const double downVar = smc.var(i, down, smc_Vm);
+            const double leftVar =  smc.var(left, j, smc_Vm);
+            const double rightVar = smc.var(right, j, smc_Vm);
+            const double* __restrict__ diffusion = cpl_cef.smc_diffusion;
 
-		homo_fluxes[cpl_Vm] = -cpl_cef.Vm_hm_smc
+		    smc.homo_fluxi, j, cpl_Vm) = -cpl_cef.Vm_hm_smc
 			  * (diffusion[0] * (var - upVar)
 			  +  diffusion[1] * (var - downVar)
 			  +  diffusion[2] * (var - leftVar)
@@ -359,23 +353,17 @@ void coupling_implicit(double t, double y[],
 #pragma ivdep
 #pragma omp parallel for
         for (int ij = 0; ij < grid.num_ec_circumferentially * grid.num_ec_axially; ij++) {
-                int i = ij / grid.num_ec_axially + 1;
-                int j = ij % grid.num_ec_axially + 1;
-		int up = j - 1, down = j + 1, left = i - 1, right = i + 1;
-                const double* __restrict__ vars =  ec[i][j].vars;
-                const double* __restrict__ upVars = ec[i][up].vars;
-                const double* __restrict__ downVars = ec[i][down].vars;
-                const double* __restrict__ leftVars = ec[left][j].vars;
-                const double* __restrict__ rightVars = ec[right][j].vars;
-                const double var = vars[ec_Vm];
-                const double upVar = upVars[ec_Vm];
-                const double downVar = downVars[ec_Vm];
-                const double leftVar = leftVars[ec_Vm];
-                const double rightVar = rightVars[ec_Vm];
-                const double* __restrict__ diffusion = cpl_cef.ec_diffusion;
-                double* __restrict__ homo_fluxes = ec[i][j].homo_fluxes;
+            int i = ij / grid.num_ec_axially + 1;
+            int j = ij % grid.num_ec_axially + 1;
+		    int up = j - 1, down = j + 1, left = i - 1, right = i + 1;
+            const double var = ec.var(i, j, ec_Vm);
+            const double upVar = ec.var(i, up, ec_Vm);
+            const double downVar = ec.var(i, down, ec_Vm);
+            const double leftVar = ec.var(left, j, ec_Vm);
+            const double rightVar = ec.var(right, j, ec_Vm);
+            const double* __restrict__ diffusion = cpl_cef.ec_diffusion;
 
-		ec.homo_flux(i, j, cpl_Vm) = -cpl_cef.Vm_hm_ec
+		    ec.homo_flux(i, j, cpl_Vm) = -cpl_cef.Vm_hm_ec
 			  * (diffusion[0] * (var - upVar)
 			  +  diffusion[1] * (var - downVar)
 			  +  diffusion[2] * (var - leftVar)
