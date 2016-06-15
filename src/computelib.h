@@ -231,7 +231,7 @@ public:
 		this->jplc.resize(_nc * _na);
 	}
 	inline double& JPLC(int i, int j) {
-		this->jplc[this->getFlatIndex(i, j)];
+		return this->jplc[this->getFlatIndex(i, j)];
 	}
 };
 

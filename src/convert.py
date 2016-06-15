@@ -1,5 +1,6 @@
 import re
 import glob
+import fileinput
 
 pats = {
 	r'(\w+)\[(\w+)\]\[(\w+)\]\.vars\[(\w+)\]': '\\1.var(\\2, \\3, \\4)',
@@ -14,15 +15,8 @@ pats = {
 }
 
 
-for file in glob.glob('*.h') + glob.glob('*.cpp'):
-	print(file)
-	newf = open(file + '.new', 'w')
-	for line in open(file).readlines():
-		newline = line[:]
-		for old, new in pats.items():
-			newline = re.sub(old, new, newline)
-		if newline != line:
-			print '<', line
-			print '>', newline
-		newf.write(newline)
-	newf.close()
+for line in fileinput.input():
+    newline = line[:]
+    for old, new in pats.items():
+        newline = re.sub(old, new, newline)
+    print(newline, end='')

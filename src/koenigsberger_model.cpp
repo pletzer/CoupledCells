@@ -76,29 +76,25 @@ void initialize_koenigsberger_smc(const grid_parms& grid, double* __restrict__ y
 #pragma ivdep
 #pragma omp for simd collapse(2)
 	int nc = grid.num_smc_circumferentially + grid.num_ghost_cells;
-        int na = grid.num_smc_axially + grid.num_ghost_cells;
-        for (int ij = 0; ij < nc * na; ij++) {
-	        int i = ij / na;
-                int j = ij % na;
-                double* __restrict__ vars = smc[i][j].vars;
-                double* __restrict__ fluxes = smc[i][j].fluxes;
-                double* __restrict__ homo_fluxes = smc[i][j].homo_fluxes;
-                double* __restrict__ hetero_fluxes = smc[i][j].hetero_fluxes;
-		vars[smc_Ca] = 0.0;
-	        vars[smc_SR] = 0.0;
-		vars[smc_Vm] = 0.0;
-	        vars[smc_w] = 0.0;
-		vars[smc_IP3] = 0.0;
+    int na = grid.num_smc_axially + grid.num_ghost_cells;
+    for (int ij = 0; ij < nc * na; ij++) {
+        int i = ij / na;
+        int j = ij % na;
+        smc.var(i, j, smc_Ca) = 0.0;
+        smc.var(i, j, smc_SR) = 0.0;
+        smc.var(i, j, smc_Vm) = 0.0;
+        smc.var(i, j, smc_w) = 0.0;
+        smc.var(i, j, smc_IP3) = 0.0;
 
-		// TODO: remove initialising fluxes for lemon model even when not used....
-		for (int k = 0; k < grid.num_fluxes_smc; k++) {
-			fluxes[k] = 0.1;
-		}
-		for (int k = 0; k < grid.num_coupling_species_smc; k++) {
-			homo_fluxes[k] = 0.1;
-			hetero_fluxes[k] = 0.1;
-		}
-	}
+        // TODO: remove initialising fluxes for lemon model even when not used....
+        for (int k = 0; k < grid.num_fluxes_smc; k++) {
+            smc.flux(i, j, k) = 0.1;
+        }
+        for (int k = 0; k < grid.num_coupling_species_smc; k++) {
+            smc.homo_flux(i, j, k) = 0.1;
+            smc.hetero_flux(i, j, k) = 0.1;
+        }
+    }
 }
 
 /// Initial values found by running a sufficiently long simulation and recording state values
@@ -184,23 +180,22 @@ void koenigsberger_smc_implicit(const grid_parms& grid, SMC_type&  __restrict__ 
 	// Evaluate single cell fluxes.
 #pragma omp parallel for
 	for (int ij = 0; ij < na * nc; ij++) {
-	        int i = ij / na + 1;
-                int j = ij % na + 1;
+        int i = ij / na + 1;
+        int j = ij % na + 1;
 
-                double* flxs = smc[i][j].fluxes;
-                const double vSmc_Vm = smc.var(i, j, smc_Vm);
-                const double vSmc_Ca = smc.var(i, j, smc_Ca);
+        const double vSmc_Vm = smc.var(i, j, smc_Vm);
+        const double vSmc_Ca = smc.var(i, j, smc_Ca);
 
 		//Jvocc
-		flxs[J_VOCC] = GCai * (vSmc_Vm - vCa1) / (1. + exp(-(vSmc_Vm - vCa2) / RCai));
+		smc.flux(i, j, J_VOCC) = GCai * (vSmc_Vm - vCa1) / (1. + exp(-(vSmc_Vm - vCa2) / RCai));
 		//J Na/Ca
-		flxs[J_Na_Ca] = GNaCai * vSmc_Ca * (vSmc_Vm - vNaCai) / (vSmc_Ca + cNaCai);
+		smc.flux(i, j, J_Na_Ca) = GNaCai * vSmc_Ca * (vSmc_Vm - vNaCai) / (vSmc_Ca + cNaCai);
 		//JNa/K
-		flxs[J_Na_K] = FNaK;
+		smc.flux(i, j, J_Na_K) = FNaK;
 		//J Cl
-		flxs[J_Cl] = GCli * (vSmc_Vm - vCl);
+		smc.flux(i, j, J_Cl) = GCli * (vSmc_Vm - vCl);
 		//JK
-		flxs[J_K] = GKi * smc.var(i, j, smc_w) * (vSmc_Vm - vKi);
+		smc.flux(i, j, J_K) = GKi * smc.var(i, j, smc_w) * (vSmc_Vm - vKi);
 	}
 }
 
@@ -212,40 +207,38 @@ void koenigsberger_smc_explicit(const grid_parms& grid, SMC_type&  __restrict__ 
 #pragma ivdep
 #pragma omp parallel for
 	for (int ij = 0; ij < na * nc; ij++) {
-	        int i = ij / na + 1;
-                int j = ij % na + 1;
+        int i = ij / na + 1;
+        int j = ij % na + 1;
 
-		double* flxs = smc[i][j].fluxes;
-		const double* vars = smc[i][j].vars;
-		const double vSmc_IP3 = vars[smc_IP3];
-		const double vSmc_Ca = vars[smc_Ca];
-		const double vSmc_SR = vars[smc_SR];
-		const double vSmc_Vm = vars[smc_Vm];
+		const double vSmc_IP3 = smc.var(i, j, smc_IP3);
+		const double vSmc_Ca = smc.var(i, j, smc_Ca);
+		const double vSmc_SR = smc.var(i, j, smc_SR);
+		const double vSmc_Vm = smc.var(i, j, smc_Vm);
 
 		//JIP3
-		flxs[J_IP3] = (Fi * P2(vSmc_IP3)) / (P2(Kri) + P2(vSmc_IP3));
+		smc.flux(i, j, J_IP3) = (Fi * P2(vSmc_IP3)) / (P2(Kri) + P2(vSmc_IP3));
 		//JSRuptake
-		flxs[J_SERCA] = (Bi * P2(vSmc_Ca)) / (P2(
+		smc.flux(i, j, J_SERCA) = (Bi * P2(vSmc_Ca)) / (P2(
 					vSmc_Ca) + P2(cbi));
 		//Jcicr
-		flxs[J_CICR] = (CICRi * (P2(vSmc_SR) * P4(
+		smc.flux(i, j, J_CICR) = (CICRi * (P2(vSmc_SR) * P4(
 					vSmc_Ca))) / ((P2(sci) + P2(vSmc_SR))
 			* (P4(cci)+ P4(
 							vSmc_Ca)));
 		//Jextrusion
-		flxs[J_Extrusion] = Di * vSmc_Ca * (1. + ((vSmc_Vm - vdi) / Rdi));
+		smc.flux(i, j, J_Extrusion) = Di * vSmc_Ca * (1. + ((vSmc_Vm - vdi) / Rdi));
 
 		//Jleak
-		flxs[J_Leak] = Li * vSmc_SR;
+		smc.flux(i, j, J_Leak) = Li * vSmc_SR;
 		//Jvocc
-		flxs[J_VOCC] = GCai * (vSmc_Vm - vCa1) / (1. + (exp(-(vSmc_Vm - vCa2) / RCai)));
+		smc.flux(i, j, J_VOCC) = GCai * (vSmc_Vm - vCa1) / (1. + (exp(-(vSmc_Vm - vCa2) / RCai)));
 		//J Na/Ca
-		flxs[J_Na_Ca] = GNaCai * vSmc_Ca * (vSmc_Vm - vNaCai) / (vSmc_Ca + cNaCai);
+		smc.flux(i, j, J_Na_Ca) = GNaCai * vSmc_Ca * (vSmc_Vm - vNaCai) / (vSmc_Ca + cNaCai);
 		//Kactivation
-		flxs[K_activation] = P2(vSmc_Ca + cwi) / (P2(
+		smc.flux(i, j, K_activation) = P2(vSmc_Ca + cwi) / (P2(
 					vSmc_Ca + cwi) + beta * exp(-(vSmc_Vm - vCa3) / RKi));
 		//Jdegradation
-		flxs[J_IP3_deg] = ki * vSmc_IP3;
+		smc.flux(i, j, J_IP3_deg) = ki * vSmc_IP3;
 	}
 }
 
@@ -255,16 +248,13 @@ void koenigsberger_smc_derivatives_implicit(double* __restrict__ f,
 #pragma ivdep
         for(int ij = 0; ij < grid.num_smc_circumferentially * grid.num_smc_axially; ij++) {
 	        int i = ij / grid.num_smc_axially + 1;
-                int j = ij % grid.num_smc_axially + 1;
-                int k = (i - 1) * grid.neq_smc_axially;
-                int ktot = k + (j - 1) * grid.neq_smc;
-                const double* flxs = smc[i][j].fluxes;
-                const double* homo_flxs = smc[i][j].homo_fluxes;
-                const double* hetero_flxs = smc[i][j].hetero_fluxes;
+            int j = ij % grid.num_smc_axially + 1;
+            int k = (i - 1) * grid.neq_smc_axially;
+            int ktot = k + (j - 1) * grid.neq_smc;
 
-		f[ktot + smc_Vm] = gama
-					* (-flxs[J_Na_K] - flxs[J_Cl] - (2 * flxs[J_VOCC]) - flxs[J_Na_Ca] - flxs[J_K])
-					+ homo_flxs[cpl_Vm] + hetero_flxs[cpl_Vm];
+		    f[ktot + smc_Vm] = gama
+					* (-smc.flux(i, j, J_Na_K) - smc.flux(i, j, J_Cl) - (2 * smc.flux(i, j, J_VOCC)) - smc.flux(i, j, J_Na_Ca) - smc.flux(i, j, J_K))
+					+ smc.homo_flux(i, j, cpl_Vm) + smc.hetero_flux(i, j, cpl_Vm);
 
 #if PLOTTING && EXPLICIT_ONLY
 			if (i == SMC_COL && j == SMC_ROW && grid.universal_rank == RANK)
@@ -335,52 +325,50 @@ void koenigsberger_ec_explicit(const grid_parms& grid, EC_type&  __restrict__ ec
 	// Evaluate single cell fluxes.
 #pragma omp parallel for
 	for (int ij = 0; ij < na * nc; ij++) {
-	        int i = ij / na + 1;
-                int j = ij % na + 1;
+        int i = ij / na + 1;
+        int j = ij % na + 1;
 
-		double* flxs = ec[i][j].fluxes;
-		const double* vars = ec[i][j].vars;
-		const double vEc_Ca = vars[ec_Ca];
-		const double vEc_Vm = vars[ec_Vm];
-		const double vEc_SR = vars[ec_SR];
-		const double vEc_IP3 = vars[ec_IP3];
+		const double vEc_Ca = ec.var(i, j, ec_Ca);
+		const double vEc_Vm = ec.var(i, j, ec_Vm);
+		const double vEc_SR = ec.var(i, j, ec_SR);
+		const double vEc_IP3 = ec.var(i, j, ec_IP3);
 		const double log10_ec_Ca = log10(vEc_Ca);
 
 		//JIP3
-		flxs[J_IP3] = (Fj * P2(vEc_IP3)) / (P2(Krj) + P2(vEc_IP3));
+		ec.flux(i, j, J_IP3) = (Fj * P2(vEc_IP3)) / (P2(Krj) + P2(vEc_IP3));
 		//JSRuptake
-		flxs[J_SERCA] = (Bj * P2(vEc_Ca)) / (P2(vEc_Ca) + P2(cbj));
+		ec.flux(i, j, J_SERCA) = (Bj * P2(vEc_Ca)) / (P2(vEc_Ca) + P2(cbj));
 		//Jcicr
-		flxs[J_CICR] = (CICRj * P2(vEc_SR) * P4(vEc_Ca))
+		ec.flux(i, j, J_CICR) = (CICRj * P2(vEc_SR) * P4(vEc_Ca))
 		  / ((P2(vEc_SR) + P2(scj))*(P4(vEc_Ca)+P4(ccj)));
 		//Jextrusion
-		flxs[J_Extrusion] = Dj * vEc_Ca;
+		ec.flux(i, j, J_Extrusion) = Dj * vEc_Ca;
 		//Jleak
-		flxs[J_Leak] = Lj * vEc_SR;
+		ec.flux(i, j, J_Leak) = Lj * vEc_SR;
 
 		//IP3 degradation
-		flxs[J_IP3_deg] = kDeg * vEc_IP3;
+		ec.flux(i, j, J_IP3_deg) = kDeg * vEc_IP3;
 
 		//J_NonSelective Cation channels
-		flxs[J_NSC] = (Gcatj * (ECa - vEc_Vm) * 0.5)
+		ec.flux(i, j, J_NSC) = (Gcatj * (ECa - vEc_Vm) * 0.5)
 		  * (1 + ((double) (tanh((double) ((log10_ec_Ca - m3cat) / m4cat)))));
 		//BK_channels
-		flxs[J_BK_Ca] = (0.4 / 2.) * (1. + tanh(
+		ec.flux(i, j, J_BK_Ca) = (0.4 / 2.) * (1. + tanh(
 				       ((log10_ec_Ca - c1j) * (vEc_Vm - bj) - a1j)
 						 / ((m3b * (P2(vEc_Vm+(a2j*(log10_ec_Ca - c1j)) - bj))) + m4b)));
 		//SK_channels
-		flxs[J_SK_Ca] = (0.6 / 2.) * (1. + tanh((log10_ec_Ca - m3s) / m4s));
+		ec.flux(i, j, J_SK_Ca) = (0.6 / 2.) * (1. + tanh((log10_ec_Ca - m3s) / m4s));
 		//Grouping all other trivial Ca fluxes
-		flxs[J_trivial_Ca] = J0j;
+		ec.flux(i, j, J_trivial_Ca) = J0j;
 
 		// Ratio of bound to total P2Y
-		flxs[L_P_P2Y] = ec.JPLC(i, j) / (ec.JPLC(i, j) + kATP); // TODO: Does this need to be calculated every time? is JPLC constant?
+		ec.flux(i, j, L_P_P2Y) = ec.JPLC(i, j) / (ec.JPLC(i, j) + kATP); // TODO: Does this need to be calculated every time? is JPLC constant?
 
 		// Rate of PIP2 hydrolysis.
-		flxs[R_PIP2_H] = alpha_j * (vEc_Ca / (vEc_Ca + KCa)) * ec.var(i, j, ec_Gprot);
+		ec.flux(i, j, R_PIP2_H) = alpha_j * (vEc_Ca / (vEc_Ca + KCa)) * ec.var(i, j, ec_Gprot);
 
 		// Induced IP3 influx
-		flxs[J_ind_I] = (flxs[R_PIP2_H] * cons_PIP2 * unitcon_a) / (N_a * V_ec);
+		ec.flux(i, j, J_ind_I) = (ec.flux(i, j, R_PIP2_H) * cons_PIP2 * unitcon_a) / (N_a * V_ec);
 
 	}
 }
