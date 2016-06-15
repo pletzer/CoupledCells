@@ -173,7 +173,7 @@ typedef struct
 
 typedef struct
 {
-	double *vars;		///storage for the state variables corresponding to an SMC.
+	double* vars;		///storage for the state variables corresponding to an SMC.
 	double* fluxes;			    ///stores single cell fluxes
 	double* homo_fluxes;			    ///stores homogeneous coupling fluxes
 	double* hetero_fluxes;			    ///stores heterogeneous coupling fluxes
@@ -190,11 +190,13 @@ public:
 		_nv = num_vars;
 		_nf = num_fluxes;
 		_ncs = num_coupling_species;
-		_ntot = (_nv + _nf + 2*_ncs) * _na * _nc;
-		this->data = new double[_ntot];
+		this->data = 0;
 	}
 	virtual ~Cell_type() {
-		delete this->data;
+		if(this->data) delete[] this->data;
+	}
+	void build() {
+		this->data = new double[_nc * _na * (_nv + _nf + 2*_ncs)];
 	}
 	inline void set_var(int i, int j, int k, double val) {
 		this->data[this->getFlatIndex(i, j) + k] = val;
@@ -222,15 +224,13 @@ public:
 		return this->data[this->getFlatIndex(i, j) + k + _nv + _nf + _ncs];
 	}
 
-private:
+protected:
 	double* data;
 	int _nc;
 	int _na;
 	int _nv;
 	int _nf;
 	int _ncs;
-	int _ntot;
-protected:
 	inline int getFlatIndex(int i, int j) const {
 		return (_nv + _nf + 2*_ncs) * (_na*i + j);
 	}
@@ -238,8 +238,41 @@ protected:
 
 class EC_type : public Cell_type {
 public:
-	std::vector<double> JPLC;
+	std::vector<double> jplc;
+	void build() {
+		Cell_type::build();
+		this->jplc.resize(_nc * _na);
+	}
+	inline void set_JPLC(int i, int j, double val) {
+		this->jplc[this->getFlatIndex(i, j)] = val;
+	}
+	inline double get_JPLC(int i, int j) const {
+		return this->jplc[this->getFlatIndex(i, j)];
+	}
 };
+
+class SMC_type : public Cell_type {
+public:
+	std::vector<double> no, ne;
+	void build() {
+		Cell_type::build();
+		this->no.resize(_nc * _na);
+		this->ne.resize(_nc * _na);
+	}
+	inline void set_NO(int i, int j, double val) {
+		this->no[this->getFlatIndex(i, j)] = val;
+	}
+	inline void set_NE(int i, int j, double val) {
+		this->ne[this->getFlatIndex(i, j)] = val;
+	}
+	inline double get_NO(int i, int j) const {
+		return this->no[this->getFlatIndex(i, j)];
+	}
+	inline double get_NE(int i, int j) const {
+		return this->ne[this->getFlatIndex(i, j)];
+	}
+};
+
 
 typedef struct
 {
