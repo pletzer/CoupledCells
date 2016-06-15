@@ -189,7 +189,7 @@ public:
 		_nv = -1;
 		_nf = -1;
 		_ncs = -1;
-		this->data = 0;
+		this->data.resize(0);
 	}
 	virtual ~Cell_type() {
 		this->destroy();
@@ -204,10 +204,10 @@ public:
 		_nv = num_vars;
 		_nf = num_fluxes;
 		_ncs = num_coupling_species;
-		this->data = new double[_nc * _na * (_nv + _nf + 2*_ncs)];
+		this->data.resize(_nc * _na * (_nv + _nf + 2*_ncs));
 	}
 	void destroy() {
-		if (this->data) delete[] this->data;
+		this->data.resize(0);
 	}
 	inline double& var(int i, int j, int k) {
 		return this->data[this->getFlatIndex(i, j) + k];
@@ -223,7 +223,7 @@ public:
 	}
 
 protected:
-	double* data;
+	std::vector<double> data;
 	int _nc;
 	int _na;
 	int _nv;
