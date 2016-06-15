@@ -288,11 +288,11 @@ void Initialize_tsoukias_smc(grid_parms grid, double y[], SMC_type&  smc)
 				smc.var(i, j, smc_DAG)			= 0.0;
 
 				for (int k = 1; k <= grid.num_fluxes_smc; k++) {
-					smc[i][j].fluxes[k - 1] = 0.0;
+					smc.flux(i, j, k - 1) = 0.0;
 				}
 				for (int k = 1; k <= grid.num_coupling_species_smc; k++) {
-					smc[i][j].homo_fluxes[k - 1] = 0.0;
-					smc[i][j].hetero_fluxes[k - 1] = 0.0;
+					smc.homo_flux(i, j, k - 1) = 0.0;
+					smc.hetero_flux(i, j, k - 1) = 0.0;
 				}
 			}
 		}
@@ -351,8 +351,7 @@ void tsoukias_smc(grid_parms grid, SMC_type&  smc)
 			smc.flux(i, j, i_KCa) =
 			    1e6 * P_BKCa * smc.var(i, j, smc_Vm) * (P2(F) /
 								   (R_const * T)) *
-			    ((K_o - (smc.var(i, j, smc_K_i) * exp(smc.var(i, j, smc_Vm) * F / (R_const * T)))) / (1 - exp(smc[i]
-														 [j].vars[smc_Vm]
+			    ((K_o - (smc.var(i, j, smc_K_i) * exp(smc.var(i, j, smc_Vm) * F / (R_const * T)))) / (1 - exp(smc.var(i, j, smc_Vm)
 														 * F / (R_const * T))));
 			smc.flux(i, j, I_BKCa) = Am * N_BKCa * smc.flux(i, j, P_KCa) * smc.flux(i, j, i_KCa);
 
@@ -378,8 +377,7 @@ void tsoukias_smc(grid_parms grid, SMC_type&  smc)
 			      (smc.var(i, j, smc_DAG) + K_NSC)) +
 			     d_NSCmin) * smc.flux(i, j, Po_NSC) * P_NaNSC *
 			    smc.var(i, j, smc_Vm) * (P2(F) / (R_const * T)) *
-			    ((Na_o - (smc.var(i, j, smc_Na_i) * exp(smc.var(i, j, smc_Vm) * F / (R_const * T)))) / (1 - exp(smc[i]
-														   [j].vars[smc_Vm]
+			    ((Na_o - (smc.var(i, j, smc_Na_i) * exp(smc.var(i, j, smc_Vm) * F / (R_const * T)))) / (1 - exp(smc.var(i, j, smc_Vm)
 														   * F / (R_const * T))));
 			smc.flux(i, j, IK_NSC) =
 			    1e6 * Am *
@@ -387,8 +385,7 @@ void tsoukias_smc(grid_parms grid, SMC_type&  smc)
 			      (smc.var(i, j, smc_DAG) + K_NSC)) +
 			     d_NSCmin) * smc.flux(i, j, Po_NSC) * P_KNSC *
 			    smc.var(i, j, smc_Vm) * (P2(F) / (R_const * T)) *
-			    ((K_o - (smc.var(i, j, smc_K_i) * exp(smc.var(i, j, smc_Vm) * F / (R_const * T)))) / (1 - exp(smc[i]
-														 [j].vars[smc_Vm]
+			    ((K_o - (smc.var(i, j, smc_K_i) * exp(smc.var(i, j, smc_Vm) * F / (R_const * T)))) / (1 - exp(smc.var(i, j, smc_Vm)
 														 * F / (R_const * T))));
 			smc.flux(i, j, ICa_NSC) =
 			    1e6 * Am * d_NSCmin * smc.flux(i, j, Po_NSC) *
