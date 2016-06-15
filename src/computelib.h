@@ -207,7 +207,7 @@ public:
 	inline double& homo_flux(int i, int j, int k) {
 		return this->data[this->getFlatIndex(i, j) + k + _nv + _nf];
 	}
-	inline double& hetero_flux(int i, int j, int k, double val) {
+	inline double& hetero_flux(int i, int j, int k) {
 		return this->data[this->getFlatIndex(i, j) + k + _nv + _nf + _ncs];
 	}
 
@@ -230,11 +230,8 @@ public:
 		Cell_type::build();
 		this->jplc.resize(_nc * _na);
 	}
-	inline void set_JPLC(int i, int j, double val) {
-		this->jplc[this->getFlatIndex(i, j)] = val;
-	}
-	inline double get_JPLC(int i, int j) const {
-		return this->jplc[this->getFlatIndex(i, j)];
+	inline double& JPLC(int i, int j) {
+		this->jplc[this->getFlatIndex(i, j)];
 	}
 };
 
@@ -246,16 +243,10 @@ public:
 		this->no.resize(_nc * _na);
 		this->ne.resize(_nc * _na);
 	}
-	inline void set_NO(int i, int j, double val) {
-		this->no[this->getFlatIndex(i, j)] = val;
-	}
-	inline void set_NE(int i, int j, double val) {
-		this->ne[this->getFlatIndex(i, j)] = val;
-	}
-	inline double get_NO(int i, int j) const {
+	inline double& NO(int i, int j) {
 		return this->no[this->getFlatIndex(i, j)];
 	}
-	inline double get_NE(int i, int j) const {
+	inline double& NE(int i, int j) {
 		return this->ne[this->getFlatIndex(i, j)];
 	}
 };
