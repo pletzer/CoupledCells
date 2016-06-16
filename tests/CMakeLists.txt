@@ -1,3 +1,4 @@
+add_subdirectory(base)
 add_subdirectory(c1)
 add_subdirectory(c32)
 add_subdirectory(c256f)
