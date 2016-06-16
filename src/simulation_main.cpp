@@ -190,6 +190,8 @@ int main(int argc, char* argv[])
 	nf = grid.num_fluxes_ec;
 	ncs = grid.num_coupling_species_ec;
 	ec.build(nc2, na2, nv, nf, ncs);
+	smc.debug();
+	ec.debug();
 
 	/// Allocating memory for coupling data to be sent and received through MPI.
 	/// sendbuf and recvbuf are 2D arrays with up, down, left and right directions as their first dimension.
@@ -292,6 +294,8 @@ int main(int argc, char* argv[])
 	double* yp = (double*) checked_malloc(grid.NEQ * sizeof(double), SRC_LOC);
 
 	/// Initialise state variables and coupling data values.
+	smc.debug();
+	ec.debug();
 
 	initialize_koenigsberger_smc(grid, y, smc);
 	initialize_koenigsberger_ec(grid, y, ec);
@@ -320,6 +324,8 @@ int main(int argc, char* argv[])
 
 // TODO: Move yp to solver_rk.
 
+	smc.debug();
+	ec.debug();
 #ifdef RK_SUITE
 
 	rksuite_solver_CT(tnow, tfinal, interval, y, yp, grid.NEQ, TOL, thres, file_write_per_unit_time, grid.solution_dir);

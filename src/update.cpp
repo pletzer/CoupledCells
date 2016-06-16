@@ -113,6 +113,8 @@ void communication_async_send_recv(grid_parms grid, double** sendbuf, double** r
 	CHECK_MPI_ERROR(MPI_Irecv(&recvbuf[LEFT][0], grid.num_elements_recv_left, MPI_DOUBLE, source[LEFT], MPI_ANY_TAG, grid.cart_comm, &reqs[4 + LEFT]));
 	CHECK_MPI_ERROR(MPI_Irecv(&recvbuf[RIGHT][0], grid.num_elements_recv_right, MPI_DOUBLE, source[RIGHT], MPI_ANY_TAG, grid.cart_comm, &reqs[4 + RIGHT]));
 
+	printf("*** ISend %d elements from sendbuf[%d] to proc %d\n", grid.num_elements_send_up, UP, dest[UP]);
+	for (int i = 0; i < grid.num_elements_send_up; ++i) printf("i = %d sendbuf = %lf\n", i, sendbuf[UP][i]);
 	CHECK_MPI_ERROR(MPI_Isend(&sendbuf[UP][0], grid.num_elements_send_up, MPI_DOUBLE, dest[UP], 0, grid.cart_comm, &reqs[UP]));
 	CHECK_MPI_ERROR(MPI_Isend(&sendbuf[DOWN][0], grid.num_elements_send_down, MPI_DOUBLE, dest[DOWN], 0, grid.cart_comm, &reqs[DOWN]));
 	CHECK_MPI_ERROR(MPI_Isend(&sendbuf[LEFT][0], grid.num_elements_send_left, MPI_DOUBLE, dest[LEFT], 0, grid.cart_comm, &reqs[LEFT]));

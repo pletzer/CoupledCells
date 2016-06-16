@@ -221,6 +221,11 @@ public:
 	inline double& hetero_flux(int i, int j, int k) {
 		return this->data[this->getFlatIndex(i, j) + k + _nv + _nf + _ncs];
 	}
+	virtual void debug() const {
+		printf("Cell_type: \n");
+		printf("_nc = %d _na = %d _nv = %d _nf = %d _ncs = %d\n", _nc, _na, _nv, _nf, _ncs);
+		printf("size of data: %d\n", this->data.size());
+	}
 
 protected:
 	std::vector<double> data;
