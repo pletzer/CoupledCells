@@ -235,7 +235,8 @@ protected:
 	int _nf;
 	int _ncs;
 	inline int getFlatIndex(int i, int j) const {
-		return (_nv + _nf + 2*_ncs) * (_na*i + j);
+		int iflat = (_nv + _nf + 2*_ncs) * (_na*i + j);
+		return iflat;
 	}
 };
 

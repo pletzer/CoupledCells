@@ -262,6 +262,8 @@ void communication_update_recvbuf(grid_parms grid, double** recvbuf, SMC_type&  
 	// Copy SMC data.
 	buf_offset = grid.added_info_in_send_buf;
 	k = 0;
+	printf("----- \n");
+	smc.debug();
 	for (int i = (int) recvbuf[UP][0]; i <= (int) recvbuf[UP][1]; i++) {
 		int j = 0;
 		smc.var(i, j, smc_Ca) = recvbuf[UP][buf_offset + k + 0];
